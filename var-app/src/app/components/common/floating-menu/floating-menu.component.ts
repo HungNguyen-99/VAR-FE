@@ -10,8 +10,8 @@ import {
   SimpleChange,
   SimpleChanges,
 } from '@angular/core';
-import { PLAYBACK_RATE, SCREENS } from '../../consts/system-contant';
-import { MATERIAL_MODULE } from '../../consts/material.const';
+import { PLAYBACK_RATE, SCREENS } from '../../../consts/system-contant';
+import { MATERIAL_MODULE } from '../../../consts/material.const';
 
 @Component({
   selector: 'app-floating-menu',

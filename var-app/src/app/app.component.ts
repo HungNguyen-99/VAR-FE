@@ -1,10 +1,10 @@
 import { Component, ElementRef, Renderer2, ViewChild } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { LoadingScreenComponent } from './components/loading-screen/loading-screen.component';
+import { LoadingScreenComponent } from './components/common/loading-screen/loading-screen.component';
 import { NgIf } from '@angular/common';
-import { CreateMatchComponent } from './components/create-match/create-match.component';
+import { CreateMatchComponent } from './components/common/create-match/create-match.component';
 import { MATERIAL_MODULE } from './consts/material.const';
-import { LayoutComponent } from './components/layout/layout.component';
+import { LayoutComponent } from './components/common/layout/layout.component';
 import { LocService } from './services/loc-service.service';
 import { tap } from 'rxjs';
 

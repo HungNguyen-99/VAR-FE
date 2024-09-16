@@ -1,4 +1,4 @@
 <div class="video-wrapper"  [class]="videoId" [id]="videoId">
   <video #videoPlayer class="video-var" [src]="videoUrl" (dblclick)="dbClick()" muted
-    playsinline preload="none"></video>
+    playsinline preload="none" [style.position]="dragEnabled? 'relative': ''"></video>
 </div>

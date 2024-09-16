@@ -1,0 +1,109 @@
+<div class="can">
+  <div class="container" (mouseenter)="mouseenterFn()" *ngIf="!isShow">
+    <div class="item-one item-3">
+      <div class="playback-rate-update" [ngClass]="'playback-rate-update-selected'">
+        <img style="width: 32px; height: 32px" *ngIf="screenUsing === 'x1'" [src]="'assets/x1.svg'" alt="" />
+        <img style="width: 32px; height: 32px" *ngIf="screenUsing === 'x4'" [src]="'assets/x4.svg'" alt="" />
+        <img style="width: 32px; height: 32px" *ngIf="screenUsing === 'x9'" [src]="'assets/x9.svg'" alt="" />
+      </div>
+    </div>
+  </div>
+
+  <div class="container" *ngIf="isShow" (mouseleave)="mouseleaveFn()">
+    <div class="item item-1">
+      <div class="playback-rate-update"
+        [ngClass]="screenUsing === 'x4' ? 'playback-rate-update-selected' : 'playback-rate-update-normal'"
+        (click)="switchScreen('x4')">
+        <img style="width: 32px; height: 32px" *ngIf="screenUsing === 'x4'" [src]="'assets/x4.svg'" alt="" />
+        <img style="width: 32px; height: 32px" *ngIf="screenUsing !== 'x4'" [src]="'assets/x4-gray.svg'" alt="" />
+      </div>
+    </div>
+
+    <div class="item item-2">
+      <div class="playback-rate-update"
+        [ngClass]="screenUsing === 'x9' ? 'playback-rate-update-selected' : 'playback-rate-update-normal'"
+        (click)="switchScreen('x9')">
+        <img style="width: 32px; height: 32px" *ngIf="screenUsing === 'x9'" [src]="'assets/x9.svg'" alt="" />
+        <img style="width: 32px; height: 32px" *ngIf="screenUsing !== 'x9'" [src]="'assets/x9-gray.svg'" alt="" />
+      </div>
+    </div>
+
+    <div class="item item-3">
+      <div class="playback-rate-update"
+        [ngClass]="screenUsing === 'x1' ? 'playback-rate-update-selected' : 'playback-rate-update-normal'"
+        (click)="switchScreen('x1')">
+        <img style="width: 32px; height: 32px" *ngIf="screenUsing === 'x1'" [src]="'assets/x1.svg'" alt="" />
+        <img style="width: 32px; height: 32px" *ngIf="screenUsing !== 'x1'" [src]="'assets/x1-gray.svg'" alt="" />
+      </div>
+    </div>
+  </div>
+
+  <mat-divider *ngIf="!isLive" style="margin-bottom: 10px"></mat-divider>
+
+  <div *ngIf="!isLive" class="playback-rate-update mg-10"
+    [ngClass]="curretSpeed === 2 ? 'playback-rate-update-selected' : 'playback-rate-update-normal'"
+    (click)="switchSpeedRo(2)">
+    <img style="width: 21px; height: 14px" *ngIf="curretSpeed === 2"
+      src="../../../assets/images-icon-control/rate-play.png" alt="" />
+    <img style="width: 21px; height: 14px" *ngIf="curretSpeed !== 2"
+      src="../../../assets/images-icon-control/rate-pause.png" alt="" />
+    <span style="margin-top: 2px">x1</span>
+  </div>
+
+  <div *ngIf="!isLive" class="playback-rate-update mg-10"
+    [ngClass]="curretSpeed === 1 ? 'playback-rate-update-selected' : 'playback-rate-update-normal'"
+    (click)="switchSpeedRo(1)">
+    <img style="width: 21px; height: 14px" *ngIf="curretSpeed === 1"
+      src="../../../assets/images-icon-control/rate-play.png" alt="" />
+    <img style="width: 21px; height: 14px" *ngIf="curretSpeed !== 1"
+      src="../../../assets/images-icon-control/rate-pause.png" alt="" />
+    <span style="margin-top: 2px">x0.5</span>
+  </div>
+
+  <div *ngIf="!isLive" class="playback-rate-update mg-10"
+    [ngClass]="curretSpeed === 0 ? 'playback-rate-update-selected' : 'playback-rate-update-normal'"
+    (click)="switchSpeedRo(0)">
+    <img style="width: 21px; height: 14px" *ngIf="curretSpeed === 0"
+      src="../../../assets/images-icon-control/rate-play.png" alt="" />
+    <img style="width: 21px; height: 14px" *ngIf="curretSpeed !== 0"
+      src="../../../assets/images-icon-control/rate-pause.png" alt="" />
+    <span style="margin-top: 2px">x0.05</span>
+  </div>
+
+  <mat-divider *ngIf="!isLive" style="margin-bottom: 10px"></mat-divider>
+
+  <div *ngIf="!isLive" class="playback-rate-update mg-10"
+    [ngClass]="playBackRateUsing === 'x1' ? 'playback-rate-update-selected' : 'playback-rate-update-normal'"
+    (click)="switchPlaybackRate('x1')">
+    <img *ngIf="playBackRateUsing === 'x1'" src="../../../assets/images-icon-control/play.png" alt="" />
+    <img *ngIf="playBackRateUsing !== 'x1'" src="../../../assets/images-icon-control/pause.png" alt="" />
+    <span>x1</span>
+  </div>
+
+  <div *ngIf="!isLive" class="playback-rate-update mg-10"
+    [ngClass]="playBackRateUsing === 'x0.5' ? 'playback-rate-update-selected' : 'playback-rate-update-normal'"
+    (click)="switchPlaybackRate('x0.5')">
+    <img *ngIf="playBackRateUsing === 'x0.5'" src="../../../assets/images-icon-control/play.png" alt="" />
+    <img *ngIf="playBackRateUsing !== 'x0.5'" src="../../../assets/images-icon-control/pause.png" alt="" />
+    <span>x0.5</span>
+  </div>
+
+  <div *ngIf="!isLive" class="playback-rate-update mg-10"
+    [ngClass]="playBackRateUsing === 'x0.1' ? 'playback-rate-update-selected' : 'playback-rate-update-normal'"
+    (click)="switchPlaybackRate('x0.1')">
+    <img *ngIf="playBackRateUsing === 'x0.1'" src="../../../assets/images-icon-control/play.png" alt="" />
+    <img *ngIf="playBackRateUsing !== 'x0.1'" src="../../../assets/images-icon-control/pause.png" alt="" />
+    <span>x0.1</span>
+  </div>
+
+  <mat-divider *ngIf="!isLive" style="margin-bottom: 10px"></mat-divider>
+
+  <div *ngIf="!isLive" class="playback-rate-update mg-10" [ngClass]="'playback-rate-update-selected'"
+    (click)="endTheMatch()">
+    <img src="../../../assets/images-icon-control/end_match.png" alt="" />
+  </div>
+
+  <div class="drag-handle my-2" cdkDragHandle style="margin-top: 15px">
+    <i class="drag-handle-icon material-icons">drag_handle</i>
+  </div>
+</div>

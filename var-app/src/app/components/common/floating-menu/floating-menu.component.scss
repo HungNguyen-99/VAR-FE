@@ -1,7 +1,7 @@
 
-@import "../../../assets/scss/loc-style.scss";
+@import "../../../../assets/scss/loc-style.scss";
 
-$image-hover: "../../../assets/x4-gray.svg";
+$image-hover: "../../../../assets/x4-gray.svg";
 
 .can {
   display: flex;
@@ -39,7 +39,7 @@ $image-hover: "../../../assets/x4-gray.svg";
     color: rgb(32, 33, 36);
 
     .x4-image {
-      content: url("../../../assets/x4.svg");
+      content: url("../../../../assets/x4.svg");
     }
   }
 
@@ -48,7 +48,7 @@ $image-hover: "../../../assets/x4-gray.svg";
     color: rgb(32, 33, 36);
 
     .x9-image {
-      content: url("../../../assets/x9.svg");
+      content: url("../../../../assets/x9.svg");
     }
   }
 
@@ -57,7 +57,7 @@ $image-hover: "../../../assets/x4-gray.svg";
     color: rgb(32, 33, 36);
 
     .x1-image {
-      content: url("../../../assets/x1.svg");
+      content: url("../../../../assets/x1.svg");
     }
   }
 
@@ -185,7 +185,7 @@ $image-hover: "../../../assets/x4-gray.svg";
 .container {
   position: relative;
   width: 55px;
-  margin-bottom: 42px;
+  margin-bottom: 70px;
 }
 
 .item {
@@ -193,7 +193,7 @@ $image-hover: "../../../assets/x4-gray.svg";
   padding: 4px;
   position: absolute;
   top: 0;
-  left: 0;
+  left: -14px;
   transition: all 0.3s ease-in-out;
   opacity: 0;
   visibility: hidden;

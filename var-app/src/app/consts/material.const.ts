@@ -73,7 +73,6 @@ export const MATERIAL_MODULE = [
     MatToolbarModule,
     MatTooltipModule,
     MatTreeModule,
-    MatDialogModule,
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule

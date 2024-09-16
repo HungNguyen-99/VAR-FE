@@ -1,6 +1,6 @@
 import { Component, ElementRef, HostListener, OnInit, Renderer2, ViewChild } from '@angular/core';
 import Hls from 'hls.js';
-import { WebSocketService } from '../../services/web-socket.service';
+import { WebSocketService } from '../../../services/web-socket.service';
 
 @Component({
   selector: 'app-referee-hls',

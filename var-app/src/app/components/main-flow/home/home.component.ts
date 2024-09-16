@@ -1,12 +1,15 @@
-import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
-import { FloatingMenuComponent } from '../floating-menu/floating-menu.component';
-import { SCREENS, SPEED_RO, TYPE_CONTROL } from '../../consts/system-contant';
+import { Component, ElementRef, HostListener, inject, OnInit, ViewChild } from '@angular/core';
+import { FloatingMenuComponent } from '../../common/floating-menu/floating-menu.component';
+import { SCREENS, SPEED_RO, TYPE_CONTROL } from '../../../consts/system-contant';
 import { NgClass, NgFor, NgIf } from '@angular/common';
-import { MediamtxVideoPlayerComponent } from '../mediamtx-video-player/mediamtx-video-player.component';
-import { LocService } from '../../services/loc-service.service';
-import { WebSocketService } from '../../services/web-socket.service';
-import { HandleSyncAllVideoService } from '../../services/handle-sync-all-video.service';
-import { MATERIAL_MODULE } from '../../consts/material.const';
+import { MediamtxVideoPlayerComponent } from '../../common/mediamtx-video-player/mediamtx-video-player.component';
+import { LocService } from '../../../services/loc-service.service';
+import { WebSocketService } from '../../../services/web-socket.service';
+import { HandleSyncAllVideoService } from '../../../services/handle-sync-all-video.service';
+import { MATERIAL_MODULE } from '../../../consts/material.const';
+import { MatDialog } from '@angular/material/dialog';
+import { EndMatchDialogComponent } from '../../../dialogs/end-match-dialog/end-match-dialog.component';
+import { tap } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -16,6 +19,8 @@ import { MATERIAL_MODULE } from '../../consts/material.const';
   styleUrl: './home.component.scss',
 })
 export class HomeComponent implements OnInit {
+
+  readonly dialog = inject(MatDialog);
 
   screenType = SCREENS.FOUR_SCREENS;
 
@@ -41,6 +46,8 @@ export class HomeComponent implements OnInit {
 
   selectedMarkedTimeIndex: number = -1;
 
+  isDoneUpdateTime = false;
+
   constructor(
     private locService: LocService,
     private webSocketService?: WebSocketService,
@@ -49,10 +56,22 @@ export class HomeComponent implements OnInit {
 
   ngOnInit(): void {
     this.getListCamera();
+
+    this._handleSyncAllVideoService
+      ?.getDoneUpdateTime()
+      .pipe(
+        tap((rs) => {
+          if (rs) {
+            this.isDoneUpdateTime = rs;
+          }
+        })
+      )
+      .subscribe();
   }
 
   playBackRateHls(event: string) {
     if (event !== 'x1') this.isLive = false;
+    this.controlAll(TYPE_CONTROL.PLAY);
     this._handleSyncAllVideoService?.sendPlayBackRate(event);
     let objSentToReferee = {
       playBackRate: event,
@@ -65,7 +84,17 @@ export class HomeComponent implements OnInit {
   }
 
   endTheMatchEvent() {
-    this.locService.endTheMatchEvent.next(true);
+    const dialogRef = this.dialog.open(EndMatchDialogComponent, {
+      maxHeight: '100vh',
+      maxWidth: '100vw',
+      width: '25vw'
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      console.log(`Dialog result: ${result}`);
+      if (result) {
+        this.locService.endTheMatchEvent.next(true);
+      }
+    });
   }
 
   getListCamera() {
@@ -317,14 +346,20 @@ export class HomeComponent implements OnInit {
 
   @HostListener('window:keydown.arrowleft', ['$event']) //Spin left on Normal RO
   onArrowLeft(event: KeyboardEvent) {
-    let speedRO = Math.floor(this.speedROArr[this.currIndexSpeedRO] * 100000) / 100000;
-    this.controlAll(TYPE_CONTROL.REWIND, speedRO);
+    if (this.isDoneUpdateTime) {
+      this.isDoneUpdateTime = false
+      let speedRO = Math.floor(this.speedROArr[this.currIndexSpeedRO] * 100000) / 100000;
+      this.controlAll(TYPE_CONTROL.REWIND, speedRO);
+    }
   }
 
   @HostListener('window:keydown.arrowright', ['$event']) //Spin right on Normal RO
   onArrowRight(event: KeyboardEvent) {
-    let speedRO = Math.floor(this.speedROArr[this.currIndexSpeedRO] * 100000) / 100000;
-    this.controlAll(TYPE_CONTROL.FORWARD, speedRO);
+    if (this.isDoneUpdateTime) {
+      this.isDoneUpdateTime = false
+      let speedRO = Math.floor(this.speedROArr[this.currIndexSpeedRO] * 100000) / 100000;
+      this.controlAll(TYPE_CONTROL.FORWARD, speedRO);
+    }
   }
 
   @HostListener('window:keydown.meta.shift.l', ['$event']) //SEEK TO LIVE BY RO

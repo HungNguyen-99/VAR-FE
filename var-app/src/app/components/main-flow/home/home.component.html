@@ -60,11 +60,11 @@
             </div>
         </div>
         <div class="time-display">
-            <span style="cursor: pointer" (click)="controlAll('live')">
+            <div style="cursor: pointer" (click)="controlAll('live')">
                 <div class="btn-live btn-live-on" *ngIf="isLive"></div>
                 <div class="btn-live btn-live-off" *ngIf="!isLive"></div>
                 {{ 'Trực tiếp' }}
-            </span>
+            </div>
             <span class="live-duration"><span *ngIf="!isLive">{{ translateCurrentTimeHls() }} / </span>{{
                 translateDurationHls() }}</span>
         </div>

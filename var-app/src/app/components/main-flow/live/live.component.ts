@@ -1,8 +1,8 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { CAMERA_INFOR, SCREENS } from '../../consts/system-contant';
-import { LocService } from '../../services/loc-service.service';
-import { FloatingMenuComponent } from '../floating-menu/floating-menu.component';
+import { CAMERA_INFOR, SCREENS } from '../../../consts/system-contant';
+import { LocService } from '../../../services/loc-service.service';
+import { FloatingMenuComponent } from '../../common/floating-menu/floating-menu.component';
 import { NgFor, NgIf, NgStyle } from '@angular/common';
 @Component({
   selector: 'app-live',
