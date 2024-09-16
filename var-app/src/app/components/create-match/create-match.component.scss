@@ -1,0 +1,169 @@
+.header {
+    color: white;
+    padding-left: 20px;
+    font-size: 20px;
+    font-family: system-ui;
+    margin-bottom: 1rem;
+}
+
+.cover-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.2); // Black with 20% opacity
+    z-index: 1; // Ensure it's below modal but above other content
+}
+
+.modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 30rem;
+    background: linear-gradient(90.02deg, rgba(32, 33, 36, 0.8) 30%, rgba(32, 33, 36, 0.8) 100.42%);
+    border: 1px solid #FFFFFFE5;
+    border-radius: 8px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    font-family: system-ui;
+    z-index: 2; // Ensure it's above other content
+}
+
+.modal-content {
+    background-color: transparent;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); // subtle shadow for depth
+    font-family: system-ui;
+
+    ::placeholder {
+        color: white;
+        opacity: 1;
+        /* Firefox */
+    }
+
+    ::-ms-input-placeholder {
+        /* Edge 12 -18 */
+        color: white;
+    }
+}
+
+.form-group {
+    margin-bottom: 15px;
+    width: 100%;
+
+    label {
+        color: white; // dark grey for text
+        font-size: 14px;
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    input[type="text"],
+    input[type="time"] {
+        width: 100%;
+        padding: 8px;
+        border-radius: 10px;
+        font-size: 16px;
+        box-sizing: border-box;
+        background: #FFFFFF33;
+        color: white;
+
+        &:focus {
+            outline: none;
+            border-color: #007bff; // Bootstrap blue focus
+        }
+    }
+
+    input[type="time"]::-webkit-calendar-picker-indicator {
+        color: transparent;
+    }
+}
+
+.form-group-view {
+    margin-bottom: 0.5rem;
+    // width: 100%;
+    background: #FFFFFF33;
+    padding: 12px 16px 12px 16px;
+    border-radius: 9px;
+    color: white;
+    gap: 4px;
+    opacity: 0px;
+}
+
+.info {
+    padding: 8px;
+    background: transparent;
+    color: white;
+    border-radius: 4px;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+button {
+    width: 100%;
+    background-color: white; // Bootstrap blue
+    color: black;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-transform: uppercase; // all letters in uppercase
+
+    font-family: system-ui;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 21.79px;
+    text-align: center;
+
+    &:hover {
+        background-color: darken(#007bff, 10%);
+        color: white;
+        transition: 0.3s ease;
+    }
+}
+
+.title {
+    position: relative;
+    float: left;
+    width: 90%;
+    margin: 0;
+    // margin-top: 1rem;
+}
+
+.close-button {
+    position: relative;
+    float: left;
+    // border: 1px solid white;
+    border-radius: 100%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    cursor: pointer;
+    color: #ffffff; // white color on hover
+    font-size: 32px;
+    background: #FFFFFF33;
+
+    &:hover {
+        color: #aaaaaa; // light grey color for the close button
+    }
+}
+
+
+.background {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background-image: url('/assets/background.png'); // Adjust the path as necessary
+    background-size: cover;
+    background-position: center;
+    height: 100vh; // Full viewport height
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

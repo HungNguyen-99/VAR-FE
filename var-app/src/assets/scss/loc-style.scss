@@ -1,0 +1,16 @@
+@use "sass:map";
+
+$loc-color-red: rgb(222, 40, 23);
+
+$loc-color-yellow: rgb(251, 188, 5);
+
+$loc-color-green: rgb(52, 168, 83);
+
+$loc-color-darkgray: rgb(32, 33, 36);
+$loc-color-gray: rgb(158, 160, 169);
+
+$loc-color-white: #ffffff;
+
+.mat-dialog-container{
+    padding : 0 !important
+}

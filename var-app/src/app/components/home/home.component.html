@@ -1,0 +1,72 @@
+<div class="body">
+    <app-floating-menu class="menu-bar" cdkDrag [screenUsing]="screenType" (screenUsingOut)="switchScreen($event)"
+        (playBackRateUsingOut)="playBackRateHls($event)" (setSpeedRo)="setSpeedRo($event)"
+        (endTheMatchEvent)="endTheMatchEvent()">
+    </app-floating-menu>
+
+    <div class="content-4" *ngIf="screenType === 'x4'">
+        <div class="content-4__item" *ngFor="let video of videoX4; let i = index" cdkDrag>
+            <app-mediamtx-video-player *ngIf="video  && displayComponent " [videoUrl]="video" [id]="i" [typeOfScreen]="screenType" />
+            <div class="err-container" *ngIf="!video">
+                <div class="error-camera">
+                    <img src="assets/no-camera.png" alt="Error Camera" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="pagination" *ngIf="screenType === 'x4'">
+        <button (click)="previousVideoX4()"><</button>
+        <button (click)="nextVideoX4()">></button>
+    </div>
+
+    <div class="content-9" *ngIf="screenType === 'x9'">
+        <div class="content-9__item" *ngFor="let video of videos; let i = index">
+            <app-mediamtx-video-player *ngIf="video  && displayComponent" [videoUrl]="video"
+                [id]="i" [typeOfScreen]="screenType"></app-mediamtx-video-player>
+
+            <div class="err-container" *ngIf="!video">
+                <div class="error-camera">
+                    <img src="assets/no-camera.png" alt="Error Camera" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-1" *ngIf="screenType === 'x1'">
+        <div class="content-1">
+            <div class="item-1" [ngClass]="indexForClassContainerX1 === i ? 'is-selected' : ''" #videoContainer
+                *ngFor="let video of videosForOneView; let i = index" (click)="changeSourceVideoOne(i)">
+                <app-mediamtx-video-player *ngIf="video" [videoUrl]="video" [id]="i"></app-mediamtx-video-player>
+            </div>
+        </div>
+        <div class="content-2">
+            <div #videoContainer>
+                <app-mediamtx-video-player *ngIf="screen1"
+                    [videoUrl]="videosForOneView[indexForClassContainerX1]" [typeOfScreen]="screenType"></app-mediamtx-video-player>
+            </div>
+        </div>
+    </div>
+    <div class="timeline">
+        <div #controlsHls class="controls" (mousemove)="showTimeTooltipHls($event)" (mouseleave)="hideTimeTooltipHls()"
+            (click)="seekVideoPlaybackHls($event)">
+            <div class="progress" [style.width]="handleWidthOfTimeLineHls()">
+                <div *ngFor="let time of markedTimesHls" class="mark"
+                    [style.left]="(time / getDurationHls()) * 100 + '%'">
+                </div>
+            </div>
+            <div #timeTooltipHls class="time-tooltip" [style.left]="tooltipPositionHls + 'px'">
+                {{ tooltipTimeHls }}
+            </div>
+        </div>
+        <div class="time-display">
+            <span style="cursor: pointer" (click)="controlAll('live')">
+                <div class="btn-live btn-live-on" *ngIf="isLive"></div>
+                <div class="btn-live btn-live-off" *ngIf="!isLive"></div>
+                {{ 'Trực tiếp' }}
+            </span>
+            <span class="live-duration"><span *ngIf="!isLive">{{ translateCurrentTimeHls() }} / </span>{{
+                translateDurationHls() }}</span>
+        </div>
+    </div>
+</div>

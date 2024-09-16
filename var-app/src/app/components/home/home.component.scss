@@ -1,0 +1,247 @@
+* {
+    box-sizing: border-box;
+    // overflow: hidden;
+}
+
+@mixin item {
+    color: #fff;
+    background-color: black;
+
+    .err-container {
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    &:hover {
+        cursor: pointer;
+    }
+
+    &:active {
+        border: 1px solid yellow;
+    }
+}
+
+.body {
+    overflow: hidden;
+    height: calc(100vh);
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+
+    .content-4 {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: repeat(2, 1fr);
+        column-gap: 1px;
+        row-gap: 1px;
+
+        &__item {
+            @include item;
+        }
+    }
+
+    .content-9 {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: repeat(3, 1fr);
+        column-gap: 1px;
+        row-gap: 1px;
+
+        &__item {
+            @include item;
+        }
+    }
+
+    .container-1 {
+        position: relative;
+        height: 100vh;
+
+        .content-1 {
+            background: rgba(32, 33, 36, 0.3);
+            position: absolute;
+            height: 100%;
+            width: 10%;
+            height: 100%;
+            z-index: 1;
+
+            .item-1 {
+                &:active {
+                    border: 1px solid yellow;
+                }
+            }
+        }
+
+        .content-2 {
+            z-index: 1;
+
+            &:active {
+                border: 1px solid yellow;
+            }
+        }
+    }
+
+    .is-selected {
+        border: 1px solid yellow;
+    }
+
+    .videoStream {
+        cursor: pointer;
+    }
+
+    .pagination {
+        z-index: 2;
+        height: 3rem;
+        position: absolute;
+        bottom: 3rem;
+        right: 5px;
+
+        button {
+            cursor: pointer;
+            font-weight: bold;
+        }
+    }
+
+    .timeline {
+        z-index: 2;
+        height: 3rem;
+        // width: 98%;
+        width: 100%;
+        position: absolute;
+        bottom: 1rem;
+        left: 50%;
+        transform: translate(-50%);
+        background: rgba(32, 33, 36, 0.7);
+        // padding: 0.5rem;
+        padding: 0;
+        border-radius: 4px;
+
+        .time-display {
+            width: 100%;
+            height: 70%;
+            color: white;
+            padding: 6px 0;
+
+            .btn-live {
+                width: 10px;
+                height: 10px;
+                border-radius: 100%;
+                float: left;
+                margin: 4px;
+                margin-right: 10px;
+                cursor: pointer;
+
+                &-on {
+                    background-color: red;
+                }
+
+                &-off {
+                    background-color: gray;
+                }
+            }
+
+            .live-duration {
+                position: absolute;
+                right: 10px;
+            }
+        }
+
+        .controls {
+            background-color: rgba(32, 33, 36, 0.7);
+            position: relative;
+            width: 100%;
+            height: 30%;
+            cursor: pointer;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+
+            .progress {
+                height: 100%;
+                transition: width 0.3s ease;
+                background: rgba(255, 255, 255, 0.3);
+                box-shadow: 0px 4px 10px 0px #ffffff inset;
+                box-shadow: 0px -6px 8px 0px #00000099 inset;
+                background: #ffffff;
+
+                .mark {
+                    position: absolute;
+                    top: 0;
+                    bottom: 0;
+                    width: 2px;
+                    background-color: rgba(222, 40, 23, 1);
+                }
+            }
+
+            .time-tooltip {
+                margin-left: 15px;
+                width: 62px;
+                height: 22px;
+                background: white;
+                color: black;
+                text-align: center;
+                line-height: 22px;
+                position: absolute;
+                top: 3px;
+                left: 0;
+                display: none;
+                border-radius: 10px;
+            }
+        }
+    }
+
+    .menu-bar {
+        display: flex;
+        justify-content: end;
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translate(0, -50%);
+        width: fit-content;
+        z-index: 102;
+    }
+}
+
+
+
+.container {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    /* Needed for absolute positioning inside */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.toggle-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 10px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 10px;
+    width: 100%;
+    height: 100%;
+}
+
+.cell {
+    padding: 20px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}

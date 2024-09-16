@@ -1,0 +1,4 @@
+<app-loading-screen #loadingScreen *ngIf="isLoading && !isSubmitted" />
+<app-create-match *ngIf="!isLoading && !isSubmitted" (doneInputForm)="getFormInfo($event)" />
+<app-layout *ngIf="isSubmitted" />
+

@@ -1,0 +1,18 @@
+.video-wrapper {
+  position: relative; /* Ensure the container is positioned relatively */
+  overflow: hidden;   /* Hide overflow to manage video boundaries */
+  width: 100%;        /* Define container width */
+  height: 100%;       /* Define container height */
+}
+
+// .video-var {
+//   position: absolute; /* Allow absolute positioning for dragging */
+//   cursor: grab;       /* Change cursor to indicate draggable element */
+//   transition: transform 0.1s ease; /* Smooth transition for scaling */
+// }
+
+video {
+  position: relative;
+  width: 100%;
+  height: auto;
+}
