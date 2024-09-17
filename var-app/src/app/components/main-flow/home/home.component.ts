@@ -4,7 +4,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { tap } from 'rxjs';
 import { MATERIAL_MODULE } from '../../../consts/material.const';
 import { SCREENS, SPEED_RO, TYPE_CONTROL } from '../../../consts/system-contant';
-import { EndMatchDialogComponent } from '../../../dialogs/end-match-dialog/end-match-dialog.component';
 import { HandleSyncAllVideoService } from '../../../services/handle-sync-all-video.service';
 import { LocService } from '../../../services/loc-service.service';
 import { WebSocketService } from '../../../services/web-socket.service';
@@ -54,6 +53,14 @@ export class HomeComponent implements OnInit {
 
   isDoneUpdateTime = false;
 
+  tooltipTimeHls!: string;
+  tooltipPositionHls!: number;
+  isLive = true;
+  play: boolean = false;
+
+  @ViewChild('timeTooltipHls') timeTooltipHls!: ElementRef;
+  @ViewChild('controlsHls') controlsHls!: ElementRef;
+
   constructor(
     private locService: LocService,
     private webSocketService?: WebSocketService,
@@ -61,7 +68,6 @@ export class HomeComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    // this.getListCamera();
     this.homeFacade.getListCamera();
 
     this._handleSyncAllVideoService
@@ -76,69 +82,10 @@ export class HomeComponent implements OnInit {
       .subscribe();
   }
 
-  playBackRateHls(event: string) {
-    if (event !== 'x1') this.isLive = false;
-    this.controlAll(TYPE_CONTROL.PLAY);
-    this._handleSyncAllVideoService?.sendPlayBackRate(event);
-    let objSentToReferee = {
-      playBackRate: event,
-    };
-    this.webSocketService!.sendMessage(objSentToReferee);
-  }
-
   setSpeedRo(event: number) {
     this.currIndexSpeedRO = event;
   }
-
-  endTheMatchEvent() {
-    const dialogRef = this.dialog.open(EndMatchDialogComponent, {
-      maxHeight: '100vh',
-      maxWidth: '100vw',
-      width: '25vw'
-    });
-    dialogRef.afterClosed().subscribe(result => {
-      console.log(`Dialog result: ${result}`);
-      if (result) {
-        this.locService.endTheMatchEvent.next(true);
-      }
-    });
-  }
-
-  switchScreen(screenType: string) {
-    switch (screenType) {
-      case SCREENS.FOUR_SCREENS:
-        this.videoX4 = this.videos.slice(0, 4);
-        this.screenType = screenType;
-        this.controlAll(TYPE_CONTROL.LIVE);
-        break;
-      case SCREENS.NINE_SCREENS:
-        this.screenType = screenType;
-        if (this.videos.length === 9) {
-          break;
-        } else if (this.videos.length < 9) {
-          while (this.videos.length < 9) {
-            this.videos.push('');
-          }
-        }
-        this.controlAll(TYPE_CONTROL.LIVE);
-        break;
-      case SCREENS.ONE_SCREENS:
-        this.screenType = screenType;
-        this.videosForOneView = this.videos.filter((ele) => ele !== '');
-        this.controlAll(TYPE_CONTROL.LIVE);
-        break;
-    }
-
-    localStorage.setItem('screenType', this.screenType);
-  }
-
-  tooltipTimeHls!: string;
-  tooltipPositionHls!: number;
-  isLive = true;
-  play: boolean = false;
-
-  @ViewChild('timeTooltipHls') timeTooltipHls!: ElementRef;
-  @ViewChild('controlsHls') controlsHls!: ElementRef;
+  
   showTimeTooltipHls(event: any) {
     this.tooltipTimeHls = this.getNewTimeHls(event);
     this.tooltipPositionHls = event.clientX;
@@ -182,22 +129,6 @@ export class HomeComponent implements OnInit {
     });
     return hlsCurrentTime;
     // return this.handleVideoByHlsComponent?.currentTime;
-  }
-  seekVideoPlaybackHls(event: any) {
-    let currentTime = this.getNewTimeWhenSeekHls(event);
-    this.controlAll(TYPE_CONTROL.SEEK_TIMELINE, undefined, currentTime);
-    this.controlAll(TYPE_CONTROL.PAUSE);
-    this.isLive = false;
-    let objSentToReferee = {
-      isPlay: false,
-      currentTime: currentTime,
-      seekVideoPlayback: true,
-    };
-    this.webSocketService!.sendMessage(objSentToReferee);
-  }
-  getNewTimeWhenSeekHls(event: any) {
-    let controlBarWidth = this.controlsHls!.nativeElement.clientWidth;
-    return (event.clientX / controlBarWidth) * this.getDurationHls();
   }
 
   controlAll(action: string, timeRo?: number, timelineValue?: any): void {
@@ -291,32 +222,6 @@ export class HomeComponent implements OnInit {
       return `${hours}:${minutes}:${seconds}`;
     }
     return '00:00:00';
-  }
-
-  nextVideoX4() {
-    this.currentIndexVideoX4++;
-    if (this.currentIndexVideoX4 > 1) {
-      this.currentIndexVideoX4 = 0;
-      this.videoX4 = this.videos.slice(0, 4)
-    } else {
-      this.videoX4 = this.videos.slice(4, 8);
-    }
-    while (this.videoX4.length < 4) {
-      this.videoX4.push('');
-    }
-  }
-
-  previousVideoX4() {
-    this.currentIndexVideoX4--;
-    if (this.currentIndexVideoX4 < 0) {
-      this.currentIndexVideoX4 = 1;
-      this.videoX4 = this.videos.slice(4, 8);
-    } else {
-      this.videoX4 = this.videos.slice(0, 4);
-    }
-    while (this.videoX4.length < 4) {
-      this.videoX4.push('');
-    }
   }
 
   changeSourceVideoOne(index: number) {

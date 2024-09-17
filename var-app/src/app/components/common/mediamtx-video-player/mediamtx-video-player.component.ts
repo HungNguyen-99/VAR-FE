@@ -1,11 +1,12 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, HostListener, Input, OnChanges, OnInit, Output, Renderer2, SimpleChanges, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, Renderer2, ViewChild } from '@angular/core';
 import Hls, { Fragment } from 'hls.js';
 import { Subject, takeUntil, tap } from 'rxjs';
 import { HlsConfig } from '../../../consts/hls-config.const';
-import { HandleSyncAllVideoService } from '../../../services/handle-sync-all-video.service';
-import { WebSocketService } from '../../../services/web-socket.service';
 import { SCREENS } from '../../../consts/system-contant';
+import { HandleCurrentDurationTimeService } from '../../../services/handle-current-duration-time.service';
+import { HandleSyncAllVideoService } from '../../../services/handle-sync-all-video.service';
 import { LocService } from '../../../services/loc-service.service';
+import { WebSocketService } from '../../../services/web-socket.service';
 @Component({
   selector: 'app-mediamtx-video-player',
   templateUrl: './mediamtx-video-player.component.html',
@@ -45,7 +46,8 @@ export class MediamtxVideoPlayerComponent implements OnInit, AfterViewInit {
     private _handleSyncAllVideoService?: HandleSyncAllVideoService,
     private webSocketService?: WebSocketService,
     private renderer?: Renderer2,
-    private locService?: LocService
+    private locService?: LocService,
+    private handleCurrentDurationTimeService?: HandleCurrentDurationTimeService
   ) {
   }
 
@@ -80,6 +82,10 @@ export class MediamtxVideoPlayerComponent implements OnInit, AfterViewInit {
           video.addEventListener('timeupdate', () => {
             this.currentTime = video.currentTime;
             this.duration = video.duration;
+            if(this.handleCurrentDurationTimeService){
+              this.handleCurrentDurationTimeService.currentTime = this.currentTime;
+              this.handleCurrentDurationTimeService.duration = this.duration;
+            }
             this._handleSyncAllVideoService?.sendDoneUpdateTime(true);
           });
           video.addEventListener('canplay', () => {

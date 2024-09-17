@@ -1,8 +1,8 @@
 @if (homeFacade.vm$ | async; as vm){
     <div class="body">
         <app-floating-menu class="menu-bar" cdkDrag [screenUsing]="vm.screenType" (screenUsingOut)="homeFacade.switchScreen($event)"
-            (playBackRateUsingOut)="playBackRateHls($event)" (setSpeedRo)="setSpeedRo($event)"
-            (endTheMatchEvent)="endTheMatchEvent()">
+            (playBackRateUsingOut)="homeFacade.playBackRateHls($event)" (setSpeedRo)="setSpeedRo($event)"
+            (endTheMatchEvent)="homeFacade.endTheMatchEvent()">
         </app-floating-menu>
     
         <div class="content-4" *ngIf="vm.screenType === 'x4'">
@@ -17,8 +17,8 @@
         </div>
     
         <div class="pagination" *ngIf="vm.screenType === 'x4'">
-            <button (click)="previousVideoX4()"><</button>
-            <button (click)="nextVideoX4()">></button>
+            <button (click)="homeFacade.previousVideoX4()"><</button>
+            <button (click)="homeFacade.nextVideoX4()">></button>
         </div>
     
         <div class="content-9" *ngIf="vm.screenType === 'x9'">
@@ -50,7 +50,7 @@
         </div>
         <div class="timeline">
             <div #controlsHls class="controls" (mousemove)="showTimeTooltipHls($event)" (mouseleave)="hideTimeTooltipHls()"
-                (click)="seekVideoPlaybackHls($event)">
+                (click)="homeFacade.seekVideoPlaybackHls($event, controlsHls.clientWidth)">
                 <div class="progress" [style.width]="handleWidthOfTimeLineHls()">
                     <div *ngFor="let time of markedTimesHls" class="mark"
                         [style.left]="(time / getDurationHls()) * 100 + '%'">
@@ -62,11 +62,11 @@
             </div>
             <div class="time-display">
                 <div style="cursor: pointer" (click)="controlAll('live')">
-                    <div class="btn-live btn-live-on" *ngIf="isLive"></div>
-                    <div class="btn-live btn-live-off" *ngIf="!isLive"></div>
+                    <div class="btn-live btn-live-on" *ngIf="vm.isLive"></div>
+                    <div class="btn-live btn-live-off" *ngIf="!vm.isLive"></div>
                     {{ 'Trực tiếp' }}
                 </div>
-                <span class="live-duration"><span *ngIf="!isLive">{{ translateCurrentTimeHls() }} / </span>{{
+                <span class="live-duration"><span *ngIf="!vm.isLive">{{ translateCurrentTimeHls() }} / </span>{{
                     translateDurationHls() }}</span>
             </div>
         </div>
