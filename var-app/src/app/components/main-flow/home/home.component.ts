@@ -1,24 +1,30 @@
+import { AsyncPipe, NgClass, NgFor, NgIf } from '@angular/common';
 import { Component, ElementRef, HostListener, inject, OnInit, ViewChild } from '@angular/core';
-import { FloatingMenuComponent } from '../../common/floating-menu/floating-menu.component';
+import { MatDialog } from '@angular/material/dialog';
+import { tap } from 'rxjs';
+import { MATERIAL_MODULE } from '../../../consts/material.const';
 import { SCREENS, SPEED_RO, TYPE_CONTROL } from '../../../consts/system-contant';
-import { NgClass, NgFor, NgIf } from '@angular/common';
-import { MediamtxVideoPlayerComponent } from '../../common/mediamtx-video-player/mediamtx-video-player.component';
+import { EndMatchDialogComponent } from '../../../dialogs/end-match-dialog/end-match-dialog.component';
+import { HandleSyncAllVideoService } from '../../../services/handle-sync-all-video.service';
 import { LocService } from '../../../services/loc-service.service';
 import { WebSocketService } from '../../../services/web-socket.service';
-import { HandleSyncAllVideoService } from '../../../services/handle-sync-all-video.service';
-import { MATERIAL_MODULE } from '../../../consts/material.const';
-import { MatDialog } from '@angular/material/dialog';
-import { EndMatchDialogComponent } from '../../../dialogs/end-match-dialog/end-match-dialog.component';
-import { tap } from 'rxjs';
+import { FloatingMenuComponent } from '../../common/floating-menu/floating-menu.component';
+import { MediamtxVideoPlayerComponent } from '../../common/mediamtx-video-player/mediamtx-video-player.component';
+import { HomeFacade } from './facades/home.facade';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [FloatingMenuComponent, NgIf, NgFor, NgClass, MediamtxVideoPlayerComponent, MATERIAL_MODULE],
+  imports: [FloatingMenuComponent, NgIf, NgFor, NgClass, MediamtxVideoPlayerComponent, MATERIAL_MODULE, AsyncPipe],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
+  providers: [HomeFacade]
 })
 export class HomeComponent implements OnInit {
+
+  readonly homeFacade = inject(HomeFacade);
+
+
 
   readonly dialog = inject(MatDialog);
 
@@ -55,7 +61,8 @@ export class HomeComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.getListCamera();
+    // this.getListCamera();
+    this.homeFacade.getListCamera();
 
     this._handleSyncAllVideoService
       ?.getDoneUpdateTime()
@@ -95,24 +102,6 @@ export class HomeComponent implements OnInit {
         this.locService.endTheMatchEvent.next(true);
       }
     });
-  }
-
-  getListCamera() {
-    this.videos = [];
-    this.locService.getListCamera().subscribe(
-      (rs) => {
-        if (rs) {
-          const listCamera = rs.items.map((camera: any) => camera.name);
-          listCamera.forEach((cam: string) => {
-            this.videos.push(`http://localhost:8888/${cam}/stream.m3u8`)
-          });
-          console.log(this.videos);
-          this.switchScreen(this.screenType)
-        }
-      },
-      (err) => {
-      }
-    );
   }
 
   switchScreen(screenType: string) {

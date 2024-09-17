@@ -7,11 +7,10 @@ import {
   OnChanges,
   OnInit,
   Output,
-  SimpleChange,
-  SimpleChanges,
+  SimpleChanges
 } from '@angular/core';
-import { PLAYBACK_RATE, SCREENS } from '../../../consts/system-contant';
 import { MATERIAL_MODULE } from '../../../consts/material.const';
+import { PLAYBACK_RATE, SCREENS } from '../../../consts/system-contant';
 
 @Component({
   selector: 'app-floating-menu',
@@ -25,7 +24,7 @@ export class FloatingMenuComponent implements OnInit, OnChanges {
 
   playBackRateUsing = '';
   curretSpeed = 2;
-  @Input() screenUsing = SCREENS.FOUR_SCREENS;
+  @Input() screenUsing: string = SCREENS.FOUR_SCREENS;
   @Input() isLive = false;
   @Input() isLiveOnPlayback = false;
   @Output() screenUsingOut = new EventEmitter();
