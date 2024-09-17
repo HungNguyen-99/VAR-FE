@@ -1,4 +1,4 @@
-import { inject, Injectable } from "@angular/core";
+import { ElementRef, inject, Injectable } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { ComponentStore } from '@ngrx/component-store';
 import { SCREENS, TYPE_CONTROL } from "../../../../consts/system-contant";
@@ -15,6 +15,10 @@ export interface IHomeState {
     videosForOneView: string[];
     isLive: boolean;
     currentIndexVideoX4: number;
+    screen1: boolean;
+    indexForClassContainerX1: number;
+    tooltipTimeHls: string;
+    tooltipPositionHls: number;
 }
 
 const initialState: IHomeState = {
@@ -23,7 +27,11 @@ const initialState: IHomeState = {
     videoX4: [],
     videosForOneView: [],
     isLive: false,
-    currentIndexVideoX4: 0
+    currentIndexVideoX4: 0,
+    screen1: false,
+    indexForClassContainerX1: 0,
+    tooltipTimeHls: '',
+    tooltipPositionHls: 0
 };
 
 @Injectable()
@@ -45,6 +53,10 @@ export class HomeFacade extends ComponentStore<IHomeState> {
     readonly updateCurrentVideosForOneView = this.updater((state, videosForOneView: string[]) => ({ ...state, videosForOneView }));
     readonly updateCurrentIsLive = this.updater((state, isLive: boolean) => ({ ...state, isLive }));
     readonly updateCurrentIndexVideoX4 = this.updater((state, currentIndexVideoX4: number) => ({ ...state, currentIndexVideoX4 }));
+    readonly updateScreen1 = this.updater((state, screen1: boolean) => ({ ...state, screen1 }));
+    readonly updateIndexForClassContainerX1 = this.updater((state, indexForClassContainerX1: number) => ({ ...state, indexForClassContainerX1 }));
+    readonly updateTooltipTimeHls = this.updater((state, tooltipTimeHls: string) => ({ ...state, tooltipTimeHls }));
+    readonly updateTooltipPositionHls = this.updater((state, tooltipPositionHls: number) => ({ ...state, tooltipPositionHls }));
 
     readonly screenType$ = this.select(state => state.screenType);
     readonly videos$ = this.select(state => state.videos);
@@ -52,6 +64,10 @@ export class HomeFacade extends ComponentStore<IHomeState> {
     readonly videosForOneView$ = this.select(state => state.videosForOneView);
     readonly isLive$ = this.select(state => state.isLive);
     readonly currentIndexVideoX4$ = this.select(state => state.currentIndexVideoX4);
+    readonly screen1$ = this.select(state => state.screen1);
+    readonly indexForClassContainerX1$ = this.select(state => state.indexForClassContainerX1);
+    readonly tooltipTimeHls$ = this.select(state => state.tooltipTimeHls);
+    readonly tooltipPositionHls$ = this.select(state => state.tooltipPositionHls);
 
     readonly vm$ = this.select({
         screenType: this.screenType$,
@@ -59,7 +75,11 @@ export class HomeFacade extends ComponentStore<IHomeState> {
         videoX4: this.videoX4$,
         videosForOneView: this.videosForOneView$,
         isLive: this.isLive$,
-        currentIndexVideoX4: this.currentIndexVideoX4$
+        currentIndexVideoX4: this.currentIndexVideoX4$,
+        screen1: this.screen1$,
+        indexForClassContainerX1: this.indexForClassContainerX1$,
+        tooltipTimeHls: this.tooltipTimeHls$,
+        tooltipPositionHls: this.tooltipPositionHls$
     });
 
 
@@ -174,6 +194,14 @@ export class HomeFacade extends ComponentStore<IHomeState> {
         this.updateCurrentVideoX4(videoX4);
     }
 
+    changeSourceVideoOne(index: number) {
+        this.updateScreen1(false);
+        this.updateIndexForClassContainerX1(index);
+        setTimeout(() => {
+            this.updateScreen1(true);
+        }, 100);
+    }
+
     seekVideoPlaybackHls(event: any, clientWidth: number) {
         let currentTime = this.getNewTimeWhenSeekHls(event, clientWidth);
         this.controlAll(TYPE_CONTROL.SEEK_TIMELINE, undefined, currentTime);
@@ -190,6 +218,36 @@ export class HomeFacade extends ComponentStore<IHomeState> {
     getNewTimeWhenSeekHls(event: any, clientWidth: number) {
         let controlBarWidth = clientWidth;
         return (event.clientX / controlBarWidth) * this._handleCurrentDurationTimeService.duration;
+    }
+
+    showTimeTooltipHls(event: any, clientWidth: number, timeTooltipHls: ElementRef) {
+        this.updateTooltipTimeHls(this.getNewTimeHls(event, clientWidth));
+        this.updateTooltipPositionHls(event.clientX);
+        timeTooltipHls!.nativeElement.style.display = 'block';
+    }
+
+    hideTimeTooltipHls(timeTooltipHls: ElementRef) {
+        timeTooltipHls!.nativeElement.style.display = 'none';
+    }
+
+    getNewTimeHls(event: any, clientWidth: number) {
+        let controlBarWidth = clientWidth;
+
+        const currentTimeInSeconds = (event.clientX / controlBarWidth) * this._handleCurrentDurationTimeService.duration;
+        if (currentTimeInSeconds) {
+            const totalHours = currentTimeInSeconds / 3600; // Chuyển từ giây sang giờ
+
+            const totalMilliseconds = totalHours * 60 * 60 * 1000; // Chuyển từ giờ sang milliseconds
+
+            const date = new Date(totalMilliseconds);
+
+            const hours = date.getUTCHours().toString().padStart(2, '0');
+            const minutes = date.getUTCMinutes().toString().padStart(2, '0');
+            const seconds = date.getUTCSeconds().toString().padStart(2, '0');
+
+            return `${hours}:${minutes}:${seconds}`;
+        }
+        return '00:00:00';
     }
 
     controlAll(action: string, timeRo?: number, timelineValue?: any): void {

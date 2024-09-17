@@ -10,11 +10,12 @@ import { WebSocketService } from '../../../services/web-socket.service';
 import { FloatingMenuComponent } from '../../common/floating-menu/floating-menu.component';
 import { MediamtxVideoPlayerComponent } from '../../common/mediamtx-video-player/mediamtx-video-player.component';
 import { HomeFacade } from './facades/home.facade';
-
+import { HandleWidthOfTimeLinePipe } from '../../../pipes/handle-width-of-timeLine.pipe';
+import { HandleCurrentDurationTimeService } from '../../../services/handle-current-duration-time.service';
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [FloatingMenuComponent, NgIf, NgFor, NgClass, MediamtxVideoPlayerComponent, MATERIAL_MODULE, AsyncPipe],
+  imports: [FloatingMenuComponent, NgIf, NgFor, NgClass, MediamtxVideoPlayerComponent, MATERIAL_MODULE, AsyncPipe, HandleWidthOfTimeLinePipe],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
   providers: [HomeFacade]
@@ -23,7 +24,7 @@ export class HomeComponent implements OnInit {
 
   readonly homeFacade = inject(HomeFacade);
 
-
+  readonly _handleCurrentDurationTimeService = inject(HandleCurrentDurationTimeService);
 
   readonly dialog = inject(MatDialog);
 
@@ -58,7 +59,7 @@ export class HomeComponent implements OnInit {
   isLive = true;
   play: boolean = false;
 
-  @ViewChild('timeTooltipHls') timeTooltipHls!: ElementRef;
+  @ViewChild('timeTooltip') timeTooltipHls!: ElementRef;
   @ViewChild('controlsHls') controlsHls!: ElementRef;
 
   constructor(
@@ -85,34 +86,7 @@ export class HomeComponent implements OnInit {
   setSpeedRo(event: number) {
     this.currIndexSpeedRO = event;
   }
-  
-  showTimeTooltipHls(event: any) {
-    this.tooltipTimeHls = this.getNewTimeHls(event);
-    this.tooltipPositionHls = event.clientX;
-    this.timeTooltipHls!.nativeElement.style.display = 'block';
-  }
-  hideTimeTooltipHls() {
-    this.timeTooltipHls!.nativeElement.style.display = 'none';
-  }
-  getNewTimeHls(event: any) {
-    let controlBarWidth = this.controlsHls!.nativeElement.clientWidth;
 
-    const currentTimeInSeconds = (event.clientX / controlBarWidth) * this.getDurationHls();
-    if (currentTimeInSeconds) {
-      const totalHours = currentTimeInSeconds / 3600; // Chuyển từ giây sang giờ
-
-      const totalMilliseconds = totalHours * 60 * 60 * 1000; // Chuyển từ giờ sang milliseconds
-
-      const date = new Date(totalMilliseconds);
-
-      const hours = date.getUTCHours().toString().padStart(2, '0');
-      const minutes = date.getUTCMinutes().toString().padStart(2, '0');
-      const seconds = date.getUTCSeconds().toString().padStart(2, '0');
-
-      return `${hours}:${minutes}:${seconds}`;
-    }
-    return '00:00:00';
-  }
   getDurationHls() {
     let hlsDuration: number = 0;
     document.querySelectorAll('.video-var').forEach((element: Element) => {
@@ -183,11 +157,6 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  handleWidthOfTimeLineHls() {
-    let currentWidth = (this.getCurrentTimeHls() / this.getDurationHls()) * 100;
-    return currentWidth + '%';
-  }
-
   translateCurrentTimeHls() {
     const currentTimeInSeconds = this.getCurrentTimeHls();
     if (currentTimeInSeconds) {
@@ -224,18 +193,10 @@ export class HomeComponent implements OnInit {
     return '00:00:00';
   }
 
-  changeSourceVideoOne(index: number) {
-    this.screen1 = false;
-    this.indexForClassContainerX1 = index;
-    setTimeout(() => {
-      this.screen1 = true;
-    }, 100);
-  }
-
   @HostListener('window:keydown.space', ['$event']) // (SPACE)
   onSpacebar(event: KeyboardEvent) {
     this._handleSyncAllVideoService?.sendPauseOrPlay(true);
-    this.isLive = false;
+    this.homeFacade.updateCurrentIsLive(false);
   }
 
   @HostListener('window:keydown.arrowleft', ['$event']) //Spin left on Normal RO
