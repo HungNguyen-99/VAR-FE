@@ -74,29 +74,82 @@ export class HomeFacade extends ComponentStore<IHomeState> {
     switchScreen(screenType: string) {
         this.updateCurrentScreenType(screenType);
         switch (screenType) {
-          case SCREENS.FOUR_SCREENS:
-            this.updateCurrentVideoX4(this.get().videos.slice(0, 4));
-            // this.controlAll(TYPE_CONTROL.LIVE);
-            break;
-          case SCREENS.NINE_SCREENS:
-            if (this.get().videos.length === 9) {
-              break;
-            } else if (this.get().videos.length < 9) {
-                const videos: string[] = this.get().videos;
-              while (videos.length < 9) {
-                videos.push('');
-              }
-              this.updateCurrentVideos(videos);
-            }
-            // this.controlAll(TYPE_CONTROL.LIVE);
-            break;
-          case SCREENS.ONE_SCREENS:
-            const videosForOneView = this.get().videos.filter((ele) => ele !== '');
-            this.updateCurrentVideosForOneView(videosForOneView);
-            // this.controlAll(TYPE_CONTROL.LIVE);
-            break;
+            case SCREENS.FOUR_SCREENS:
+                this.updateCurrentVideoX4(this.get().videos.slice(0, 4));
+                // this.controlAll(TYPE_CONTROL.LIVE);
+                break;
+            case SCREENS.NINE_SCREENS:
+                if (this.get().videos.length === 9) {
+                    break;
+                } else if (this.get().videos.length < 9) {
+                    const videos: string[] = this.get().videos;
+                    while (videos.length < 9) {
+                        videos.push('');
+                    }
+                    this.updateCurrentVideos(videos);
+                }
+                // this.controlAll(TYPE_CONTROL.LIVE);
+                break;
+            case SCREENS.ONE_SCREENS:
+                const videosForOneView = this.get().videos.filter((ele) => ele !== '');
+                this.updateCurrentVideosForOneView(videosForOneView);
+                // this.controlAll(TYPE_CONTROL.LIVE);
+                break;
         }
 
         localStorage.setItem('screenType', this.get().screenType);
-      }
+    }
+
+
+    // controlAll(action: string, timeRo?: number, timelineValue?: any): void {
+    //     if (action === TYPE_CONTROL.LIVE) {
+    //       this.isLive = true;
+    //       this._handleSyncAllVideoService?.sendSeekToLive(true);
+    //     }
+    
+    //     document.querySelectorAll('.video-var').forEach((element: Element) => {
+    //       const vid = element as HTMLVideoElement;
+    //       switch (action) {
+    //         case TYPE_CONTROL.REWIND:
+    //           vid.pause();
+    //           if (timeRo) {
+    //             vid.currentTime = Math.max(vid.currentTime - timeRo, 0);
+    //           } else {
+    //             vid.currentTime = Math.max(vid.currentTime - 1, 0);
+    //           }
+    //           this.webSocketService!.sendMessage({
+    //             isPlay: false,
+    //             currentTime: vid.currentTime,
+    //             seekVideoPlayback: true,
+    //           });
+    //           this.isLive = false;
+    //           break;
+    //         case TYPE_CONTROL.FORWARD:
+    //           vid.pause();
+    //           if (timeRo) {
+    //             vid.currentTime = Math.max(vid.currentTime + timeRo, 0);
+    //           } else {
+    //             vid.currentTime = Math.max(vid.currentTime + 1, 0);
+    //           }
+    //           this.webSocketService!.sendMessage({
+    //             isPlay: false,
+    //             currentTime: vid.currentTime,
+    //             seekVideoPlayback: true,
+    //           });
+    //           this.isLive = false;
+    //           break;
+    //         case TYPE_CONTROL.PAUSE:
+    //           this.isLive = false;
+    //           this.play = false;
+    //           vid.pause();
+    //           break;
+    //         case TYPE_CONTROL.PLAY:
+    //           vid.play().catch(error => console.error('Error playing the video:', error));
+    //           break;
+    //         case TYPE_CONTROL.SEEK_TIMELINE:
+    //           vid.currentTime = timelineValue;
+    //           break;
+    //       }
+    //     });
+    //   }
 }
