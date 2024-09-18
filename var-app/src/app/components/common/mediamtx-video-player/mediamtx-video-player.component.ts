@@ -33,7 +33,7 @@ export class MediamtxVideoPlayerComponent implements OnInit, AfterViewInit {
 
   videoId!: string;
 
-  hls = new Hls(HlsConfig);
+
   isPlay = true;
   public currentTime = 0;
   currentRate = 'x1';
@@ -53,13 +53,12 @@ export class MediamtxVideoPlayerComponent implements OnInit, AfterViewInit {
     private webSocketService?: WebSocketService,
     private renderer?: Renderer2,
     private locService?: LocService,
-    private handleCurrentDurationTimeService?: HandleCurrentDurationTimeService
   ) {
   }
 
   ngOnInit(): void {
     this.videoId = `video-container${this.id}`;
-    this.handleSubjectGetEmitData();
+    this._MediamtxVideoPlayerFacade.handleSubjectGetEmitData(this.videoPlayer);
     this.locService?.layout$.subscribe((rs) => {
       if (rs) {
         this.dragEnabled = rs.status;
@@ -68,7 +67,7 @@ export class MediamtxVideoPlayerComponent implements OnInit, AfterViewInit {
   }
  
   ngAfterViewInit() {
-    this.createVideoElement();
+    this._MediamtxVideoPlayerFacade.createVideoElement(this.videoPlayer, this.videoUrl, this.isDoneInitial);
   }
 
   dbClick(): void {
@@ -84,161 +83,114 @@ export class MediamtxVideoPlayerComponent implements OnInit, AfterViewInit {
     this._MediamtxVideoPlayerFacade.dbClick(objSentToReferee);
   }
 
-  createVideoElement(): void {
-    if (this.videoPlayer && Hls.isSupported()) {
-      let video = this.videoPlayer!.nativeElement;
-      this.hls.loadSource(this.videoUrl);
-      this.hls.attachMedia(this.videoPlayer?.nativeElement);
-      this.hls.on(Hls.Events.MEDIA_ATTACHED, () => {
-        console.log('video and hls.js are now bound together !');
-        if (this.videoPlayer) {
+  // handleSubjectGetEmitData() {
+  //   this._handleSyncAllVideoService
+  //     ?.getTime()
+  //     .pipe(
+  //       takeUntil(this.destroy$),
+  //       tap((res) => {
+  //         this.setTime(res);
+  //       })
+  //     )
+  //     .subscribe();
 
-          console.log('onPlayerReady', this);
-          video.addEventListener('timeupdate', () => {
-            this.currentTime = video.currentTime;
-            this.duration = video.duration;
-            if(this.handleCurrentDurationTimeService){
-              this.handleCurrentDurationTimeService.currentTime = this.currentTime;
-              this.handleCurrentDurationTimeService.duration = this.duration;
-            }
-            this._handleSyncAllVideoService?.sendDoneUpdateTime(true);
-          });
-          video.addEventListener('canplay', () => {
-            if (this.isPlay) {
-              video.muted = true;
-              setTimeout(() => {
-                this.isDoneInitial.emit(true);
-                video.play();
-              }, 100);
-              this.isPlay = false;
-            } else {
-              // video.pause();
-            }
-          });
-        }
-      });
-      this.hls.on(Hls.Events.MANIFEST_PARSED, (event, data) => {
-        var lowestQualityLevel = 0; // Assuming the lowest quality level corresponds to 144p
-        this.hls.levels.forEach(function (level, levelIndex) {
-          if (level.height <= 144) {
-            lowestQualityLevel = levelIndex;
-          }
-        });
-        this.hls.currentLevel = lowestQualityLevel;
-        video.play();
-      });
-      this.hls.on(Hls.Events.FRAG_LOADED, () => { });
-    }
-  }
+  //   this._handleSyncAllVideoService
+  //     ?.getPauseOrPlay()
+  //     .pipe(
+  //       takeUntil(this.destroy$),
+  //       tap((res) => {
+  //         this.handlePauseOrPlay();
+  //       })
+  //     )
+  //     .subscribe();
 
-  handleSubjectGetEmitData() {
-    this._handleSyncAllVideoService
-      ?.getTime()
-      .pipe(
-        takeUntil(this.destroy$),
-        tap((res) => {
-          this.setTime(res);
-        })
-      )
-      .subscribe();
+  //   this._handleSyncAllVideoService
+  //     ?.getSeekToLive()
+  //     .pipe(
+  //       takeUntil(this.destroy$),
+  //       tap((res) => {
+  //         this.handleSeekToLive();
+  //       })
+  //     )
+  //     .subscribe();
 
-    this._handleSyncAllVideoService
-      ?.getPauseOrPlay()
-      .pipe(
-        takeUntil(this.destroy$),
-        tap((res) => {
-          this.handlePauseOrPlay();
-        })
-      )
-      .subscribe();
+  //   this._handleSyncAllVideoService
+  //     ?.getPlayBackRate()
+  //     .pipe(
+  //       takeUntil(this.destroy$),
+  //       tap((res) => {
+  //         this.playbackRate(res);
+  //       })
+  //     )
+  //     .subscribe();
+  // }
 
-    this._handleSyncAllVideoService
-      ?.getSeekToLive()
-      .pipe(
-        takeUntil(this.destroy$),
-        tap((res) => {
-          this.handleSeekToLive();
-        })
-      )
-      .subscribe();
+  // handleSeekToLive() {
+  //   this.isPlay = true;
+  //   this.videoPlayer.nativeElement.currentTime = this.videoPlayer.nativeElement.duration - 2;
+  //   let objSentToReferee = {
+  //     isPlay: true,
+  //     currentTime: this.videoPlayer.nativeElement.currentTime,
+  //     seekVideoPlayback: true,
+  //   };
+  //   this.webSocketService!.sendMessage(objSentToReferee);
+  // }
 
-    this._handleSyncAllVideoService
-      ?.getPlayBackRate()
-      .pipe(
-        takeUntil(this.destroy$),
-        tap((res) => {
-          this.playbackRate(res);
-        })
-      )
-      .subscribe();
-  }
+  // handlePauseOrPlay() {
+  //   const video = this.videoPlayer.nativeElement;
+  //   if (!video.paused) {
+  //     const thePromise = video.play();
+  //     if (thePromise !== undefined) {
+  //       thePromise.then(() => {
+  //         video.pause();
+  //         let objSentToReferee = {
+  //           isPlay: !video.paused,
+  //           pauseOrPlayFlag: true,
+  //           currentTime: video.currentTime,
+  //         };
+  //         this.webSocketService!.sendMessage(objSentToReferee);
+  //       });
+  //     }
+  //   } else {
+  //     video.play();
+  //     let objSentToReferee = {
+  //       isPlay: !video.paused,
+  //       pauseOrPlayFlag: true,
+  //       currentTime: video.currentTime,
+  //     };
+  //     this.webSocketService!.sendMessage(objSentToReferee);
+  //   }
+  // }
 
-  handleSeekToLive() {
-    this.isPlay = true;
-    this.videoPlayer.nativeElement.currentTime = this.videoPlayer.nativeElement.duration - 2;
-    let objSentToReferee = {
-      isPlay: true,
-      currentTime: this.videoPlayer.nativeElement.currentTime,
-      seekVideoPlayback: true,
-    };
-    this.webSocketService!.sendMessage(objSentToReferee);
-  }
-
-  handlePauseOrPlay() {
-    const video = this.videoPlayer.nativeElement;
-    if (!video.paused) {
-      const thePromise = video.play();
-      if (thePromise !== undefined) {
-        thePromise.then(() => {
-          video.pause();
-          let objSentToReferee = {
-            isPlay: !video.paused,
-            pauseOrPlayFlag: true,
-            currentTime: video.currentTime,
-          };
-          this.webSocketService!.sendMessage(objSentToReferee);
-        });
-      }
-    } else {
-      video.play();
-      let objSentToReferee = {
-        isPlay: !video.paused,
-        pauseOrPlayFlag: true,
-        currentTime: video.currentTime,
-      };
-      this.webSocketService!.sendMessage(objSentToReferee);
-    }
-  }
-
-  setTime(time: number) {
-    this.isPlay = false;
-    this.videoPlayer.nativeElement.currentTime = time;
-  }
+  // setTime(time: number) {
+  //   this.isPlay = false;
+  //   this.videoPlayer.nativeElement.currentTime = time;
+  // }
 
 
-  playbackRate(rate: string) {
-    switch (rate) {
-      case 'x0.1':
-        this.videoPlayer.nativeElement.playbackRate = 0.1;
-        break;
-      case 'x0.5':
-        this.videoPlayer.nativeElement.playbackRate = 0.5;
-        break;
-      default:
-        this.videoPlayer.nativeElement.playbackRate = 1;
-    }
-    this.currentRate = rate;
-  }
+  // playbackRate(rate: string) {
+  //   switch (rate) {
+  //     case 'x0.1':
+  //       this.videoPlayer.nativeElement.playbackRate = 0.1;
+  //       break;
+  //     case 'x0.5':
+  //       this.videoPlayer.nativeElement.playbackRate = 0.5;
+  //       break;
+  //     default:
+  //       this.videoPlayer.nativeElement.playbackRate = 1;
+  //   }
+  //   this.currentRate = rate;
+  // }
   
-  checkTypeOfScreen() {
-    if (this.typeOfScreen === SCREENS.FOUR_SCREENS) {
-      return 2;
-    } else if (this.typeOfScreen === SCREENS.NINE_SCREENS) {
-      return 3;
-    } else {
-      return 1;
-    }
-  }
+  // checkTypeOfScreen() {
+  //   if (this.typeOfScreen === SCREENS.FOUR_SCREENS) {
+  //     return 2;
+  //   } else if (this.typeOfScreen === SCREENS.NINE_SCREENS) {
+  //     return 3;
+  //   } else {
+  //     return 1;
+  //   }
+  // }
 
   //=====================START ZOOM=====================
   @HostListener('wheel', ['$event'])
@@ -330,7 +282,7 @@ export class MediamtxVideoPlayerComponent implements OnInit, AfterViewInit {
           typeOfAction: 'onMouseMove',
           clientX: event.clientX,
           clientY: event.clientY,
-          typeOfScreen: this.checkTypeOfScreen()
+          typeOfScreen: this._MediamtxVideoPlayerFacade.checkTypeOfScreen() 
         }
       )
 
@@ -350,10 +302,4 @@ export class MediamtxVideoPlayerComponent implements OnInit, AfterViewInit {
   }
   //=====================STOP DRAG=====================
 
-
-  ngOnDestroy(): void {
-    if (this.hls) {
-      this.hls.destroy();
-    }
-  }
 }

@@ -32,7 +32,7 @@ const initialState: IHomeState = {
     videosForOneView: [],
     isLive: false,
     currentIndexVideoX4: 0,
-    screen1: false,
+    screen1: true,
     indexForClassContainerX1: 0,
     tooltipTimeHls: '',
     tooltipPositionHls: 0,
@@ -121,27 +121,27 @@ export class HomeFacade extends ComponentStore<IHomeState> {
 
     getListCamera() {
         const videos: string[] = [];
-        // this.locService.getListCamera().subscribe(
-        //     (rs) => {
-        //         if (rs) {
-        //             const listCamera = rs.items.map((camera: any) => camera.name);
-        //             listCamera.forEach((cam: string) => {
-        //                 videos.push(`http://localhost:8888/${cam}/stream.m3u8`)
-        //             });
-        //             this.updateCurrentVideos(videos);
-        //             //this.switchScreen(this.screenType)
-        //         }
-        //     },
-        //     (err) => {
-        //     }
-        // );
-        videos.push('https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8');
-        videos.push('https://devstreaming-cdn.apple.com/videos/streaming/examples/img_bipbop_adv_example_fmp4/master.m3u8');
-        videos.push('https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.mp4/.m3u8');
-        videos.push('https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.mp4/.m3u8');
-        videos.push('https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.mp4/.m3u8');
-        this.updateCurrentVideos(videos);
-        this.switchScreen(this.get().screenType);
+        this._locService.getListCamera().subscribe(
+            (rs) => {
+                if (rs) {
+                    const listCamera = rs.items.map((camera: any) => camera.name);
+                    listCamera.forEach((cam: string) => {
+                        videos.push(`http://localhost:8888/${cam}/stream.m3u8`)
+                    });
+                    this.updateCurrentVideos(videos);
+                    this.switchScreen(this.get().screenType);
+                }
+            },
+            (err) => {
+            }
+        );
+        // videos.push('https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8');
+        // videos.push('https://devstreaming-cdn.apple.com/videos/streaming/examples/img_bipbop_adv_example_fmp4/master.m3u8');
+        // videos.push('https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.mp4/.m3u8');
+        // videos.push('https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.mp4/.m3u8');
+        // videos.push('https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.mp4/.m3u8');
+        // this.updateCurrentVideos(videos);
+        // this.switchScreen(this.get().screenType);
     }
 
     switchScreen(screenType: string) {
@@ -215,6 +215,7 @@ export class HomeFacade extends ComponentStore<IHomeState> {
             videoX4.push('');
         }
         this.updateCurrentVideoX4(videoX4);
+        this.controlAll(TYPE_CONTROL.SEEK_TIMELINE, undefined, this._handleCurrentDurationTimeService.currentTime);
     }
 
     previousVideoX4() {
