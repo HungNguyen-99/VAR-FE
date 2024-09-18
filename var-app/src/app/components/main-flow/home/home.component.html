@@ -2,12 +2,12 @@
 <div class="body">
     <app-floating-menu class="menu-bar" cdkDrag [screenUsing]="vm.screenType"
         (screenUsingOut)="homeFacade.switchScreen($event)" (playBackRateUsingOut)="homeFacade.playBackRateHls($event)"
-        (setSpeedRo)="setSpeedRo($event)" (endTheMatchEvent)="homeFacade.endTheMatchEvent()">
+        (setSpeedRo)="homeFacade.setSpeedRo($event)" (endTheMatchEvent)="homeFacade.endTheMatchEvent()">
     </app-floating-menu>
 
     <div class="content-4" *ngIf="vm.screenType === 'x4'">
         <div class="content-4__item" *ngFor="let video of vm.videoX4; let i = index">
-            <app-mediamtx-video-player *ngIf="video  && displayComponent " [videoUrl]="video" [id]="i"
+            <app-mediamtx-video-player *ngIf="video" [videoUrl]="video" [id]="i"
                 [typeOfScreen]="vm.screenType" />
             <div class="err-container" *ngIf="!video">
                 <div class="error-camera">
@@ -24,7 +24,7 @@
 
     <div class="content-9" *ngIf="vm.screenType === 'x9'">
         <div class="content-9__item" *ngFor="let video of vm.videos; let i = index">
-            <app-mediamtx-video-player *ngIf="video  && displayComponent" [videoUrl]="video" [id]="i"
+            <app-mediamtx-video-player *ngIf="video" [videoUrl]="video" [id]="i"
                 [typeOfScreen]="vm.screenType"></app-mediamtx-video-player>
 
             <div class="err-container" *ngIf="!video">
@@ -37,7 +37,7 @@
 
     <div class="container-1" *ngIf="vm.screenType === 'x1'">
         <div class="content-1">
-            <div class="item-1" [ngClass]="indexForClassContainerX1 === i ? 'is-selected' : ''" #videoContainer
+            <div class="item-1" [ngClass]="vm.indexForClassContainerX1 === i ? 'is-selected' : ''" #videoContainer
                 *ngFor="let video of vm.videosForOneView; let i = index" (click)="homeFacade.changeSourceVideoOne(i)">
                 <app-mediamtx-video-player *ngIf="video" [videoUrl]="video" [id]="i"></app-mediamtx-video-player>
             </div>
@@ -57,8 +57,8 @@
             (click)="homeFacade.seekVideoPlaybackHls($event, controlsHls.clientWidth)">
             <div class="progress"
                 [style.width]="_handleCurrentDurationTimeService.currentTime | handleWidthOfTimeLine: _handleCurrentDurationTimeService.duration">
-                <div *ngFor="let time of markedTimesHls" class="mark"
-                    [style.left]="(time / getDurationHls()) * 100 + '%'">
+                <div *ngFor="let time of vm.markedTimesHls" class="mark"
+                    [style.left]="(time /  _handleCurrentDurationTimeService.duration) * 100 + '%'">
                 </div>
             </div>
             <div #timeTooltip class="time-tooltip" [style.left]="vm.tooltipPositionHls + 'px'">
@@ -71,8 +71,10 @@
                 <div class="btn-live btn-live-off" *ngIf="!vm.isLive"></div>
                 {{ 'Trực tiếp' }}
             </div>
-            <span class="live-duration"><span *ngIf="!vm.isLive">{{ translateCurrentTimeHls() }} / </span>{{
-                translateDurationHls() }}</span>
+            <span class="live-duration">
+                <span *ngIf="!vm.isLive">{{ _handleCurrentDurationTimeService.currentTime | translateCurrentDuration }} / </span>
+                {{ 0 | translateCurrentDuration: _handleCurrentDurationTimeService.duration }}
+            </span>
         </div>
     </div>
 </div>

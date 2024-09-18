@@ -1,7 +1,7 @@
 import { ElementRef, inject, Injectable } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { ComponentStore } from '@ngrx/component-store';
-import { SCREENS, TYPE_CONTROL } from "../../../../consts/system-contant";
+import { SCREENS, SPEED_RO, TYPE_CONTROL } from "../../../../consts/system-contant";
 import { EndMatchDialogComponent } from "../../../../dialogs/end-match-dialog/end-match-dialog.component";
 import { HandleCurrentDurationTimeService } from "../../../../services/handle-current-duration-time.service";
 import { HandleSyncAllVideoService } from "../../../../services/handle-sync-all-video.service";
@@ -19,6 +19,10 @@ export interface IHomeState {
     indexForClassContainerX1: number;
     tooltipTimeHls: string;
     tooltipPositionHls: number;
+    currIndexSpeedRO: number;
+    speedROArr: number[];
+    markedTimesHls: number[];
+    selectedMarkedTimeIndex: number;
 }
 
 const initialState: IHomeState = {
@@ -31,7 +35,11 @@ const initialState: IHomeState = {
     screen1: false,
     indexForClassContainerX1: 0,
     tooltipTimeHls: '',
-    tooltipPositionHls: 0
+    tooltipPositionHls: 0,
+    currIndexSpeedRO: 2,
+    speedROArr: SPEED_RO,
+    markedTimesHls: [],
+    selectedMarkedTimeIndex: -1
 };
 
 @Injectable()
@@ -57,6 +65,10 @@ export class HomeFacade extends ComponentStore<IHomeState> {
     readonly updateIndexForClassContainerX1 = this.updater((state, indexForClassContainerX1: number) => ({ ...state, indexForClassContainerX1 }));
     readonly updateTooltipTimeHls = this.updater((state, tooltipTimeHls: string) => ({ ...state, tooltipTimeHls }));
     readonly updateTooltipPositionHls = this.updater((state, tooltipPositionHls: number) => ({ ...state, tooltipPositionHls }));
+    readonly updateCurrIndexSpeedRO = this.updater((state, currIndexSpeedRO: number) => ({ ...state, currIndexSpeedRO }));
+    readonly updateSpeedROArr = this.updater((state, speedROArr: number[]) => ({ ...state, speedROArr }));
+    readonly updateMarkedTimesHls = this.updater((state, markedTimesHls: number[]) => ({ ...state, markedTimesHls }));
+    readonly updateSelectedMarkedTimeIndex = this.updater((state, selectedMarkedTimeIndex: number) => ({ ...state, selectedMarkedTimeIndex }));
 
     readonly screenType$ = this.select(state => state.screenType);
     readonly videos$ = this.select(state => state.videos);
@@ -68,6 +80,11 @@ export class HomeFacade extends ComponentStore<IHomeState> {
     readonly indexForClassContainerX1$ = this.select(state => state.indexForClassContainerX1);
     readonly tooltipTimeHls$ = this.select(state => state.tooltipTimeHls);
     readonly tooltipPositionHls$ = this.select(state => state.tooltipPositionHls);
+    readonly currIndexSpeedRO$ = this.select(state => state.currIndexSpeedRO);
+    readonly speedROArr$ = this.select(state => state.speedROArr);
+    readonly markedTimesHls$ = this.select(state => state.markedTimesHls);
+    readonly selectedMarkedTimeIndex$ = this.select(state => state.selectedMarkedTimeIndex);
+
 
     readonly vm$ = this.select({
         screenType: this.screenType$,
@@ -79,9 +96,28 @@ export class HomeFacade extends ComponentStore<IHomeState> {
         screen1: this.screen1$,
         indexForClassContainerX1: this.indexForClassContainerX1$,
         tooltipTimeHls: this.tooltipTimeHls$,
-        tooltipPositionHls: this.tooltipPositionHls$
+        tooltipPositionHls: this.tooltipPositionHls$,
+        currIndexSpeedRO: this.currIndexSpeedRO$,
+        speedROArr: this.speedROArr$,
+        markedTimesHls: this.markedTimesHls$,
+        selectedMarkedTimeIndex: this.selectedMarkedTimeIndex$
     });
 
+    get speedRo() {
+        return this.get().currIndexSpeedRO;
+    }
+
+    get speedROArr() {
+        return this.get().speedROArr;
+    }
+
+    get markedTimesHls() {
+        return this.get().markedTimesHls;
+    }
+
+    get selectedMarkedTimeIndex() {
+        return this.get().selectedMarkedTimeIndex;
+    }
 
     getListCamera() {
         const videos: string[] = [];
@@ -135,6 +171,10 @@ export class HomeFacade extends ComponentStore<IHomeState> {
         }
 
         localStorage.setItem('screenType', this.get().screenType);
+    }
+
+    setSpeedRo(event: number) {
+        this.updateCurrIndexSpeedRO(event);
     }
 
     playBackRateHls(event: string) {
