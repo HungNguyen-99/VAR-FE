@@ -10,7 +10,7 @@ import { HandleSyncAllVideoService } from '../../../services/handle-sync-all-vid
 import { WebSocketService } from '../../../services/web-socket.service';
 import { FloatingMenuComponent } from '../../common/floating-menu/floating-menu.component';
 import { MediamtxVideoPlayerComponent } from '../../common/mediamtx-video-player/mediamtx-video-player.component';
-import { HomeFacade } from './facades/home.facade';
+import { HomeFacade } from './home.facade';
 @Component({
   selector: 'app-home',
   standalone: true,
@@ -23,7 +23,7 @@ export class HomeComponent implements OnInit {
 
   readonly homeFacade = inject(HomeFacade);
   readonly _handleCurrentDurationTimeService = inject(HandleCurrentDurationTimeService);
-  
+
   isDoneUpdateTime = false;
 
   @ViewChild('timeTooltip') timeTooltipHls!: ElementRef;

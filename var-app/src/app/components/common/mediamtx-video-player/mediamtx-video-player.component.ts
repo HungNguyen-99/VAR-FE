@@ -1,18 +1,21 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, Renderer2, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, HostListener, inject, Input, OnInit, Output, Renderer2, ViewChild } from '@angular/core';
 import Hls, { Fragment } from 'hls.js';
 import { Subject, takeUntil, tap } from 'rxjs';
 import { HlsConfig } from '../../../consts/hls-config.const';
 import { SCREENS } from '../../../consts/system-contant';
+import { ObjDbClickSentToReferee } from '../../../interfaces';
 import { HandleCurrentDurationTimeService } from '../../../services/handle-current-duration-time.service';
 import { HandleSyncAllVideoService } from '../../../services/handle-sync-all-video.service';
 import { LocService } from '../../../services/loc-service.service';
 import { WebSocketService } from '../../../services/web-socket.service';
+import { MediamtxVideoPlayerFacade } from './mediamtx.facade';
 @Component({
   selector: 'app-mediamtx-video-player',
   templateUrl: './mediamtx-video-player.component.html',
   styleUrls: ['./mediamtx-video-player.component.scss'],
   standalone: true,
-  imports: []
+  imports: [],
+  providers: [MediamtxVideoPlayerFacade]
 })
 export class MediamtxVideoPlayerComponent implements OnInit, AfterViewInit {
   @Input() videoUrl!: string;
@@ -20,6 +23,11 @@ export class MediamtxVideoPlayerComponent implements OnInit, AfterViewInit {
   @Input() isReferee!: boolean;
   @Input() typeOfScreen!: string;
   @Input() isRefresh!: boolean;
+  @Output() isDoneInitial: EventEmitter<boolean> = new EventEmitter<boolean>();
+
+  @ViewChild('videoPlayer', { static: true }) videoPlayer!: ElementRef;
+
+  private readonly _MediamtxVideoPlayerFacade = inject(MediamtxVideoPlayerFacade);
 
   private destroy$: Subject<void> = new Subject<void>();
 
@@ -30,8 +38,6 @@ export class MediamtxVideoPlayerComponent implements OnInit, AfterViewInit {
   public currentTime = 0;
   currentRate = 'x1';
   duration = 0;
-  @ViewChild('videoPlayer', { static: true }) videoPlayer!: ElementRef;
-  @Output() isDoneInitial: EventEmitter<boolean> = new EventEmitter<boolean>();
   isDragging = false;
   startX = 0;
   startY = 0;
@@ -60,16 +66,25 @@ export class MediamtxVideoPlayerComponent implements OnInit, AfterViewInit {
       }
     });
   }
-  ngOnDestroy(): void {
-    if (this.hls) {
-      this.hls.destroy();
-    }
-  }
+ 
   ngAfterViewInit() {
-    this.createVideoElement(this.videoUrl);
+    this.createVideoElement();
   }
 
-  createVideoElement(src: string): void {
+  dbClick(): void {
+    let objSentToReferee: ObjDbClickSentToReferee = {
+      source: this.videoUrl,
+      isDbClick: true,
+      isPlay: !this.videoPlayer.nativeElement.paused,
+      currentTime: this.currentTime,
+      currentZoom: this.getZoomLevel(),
+      deltaY: this.deltaY,
+      rateValue: this.currentRate,
+    };
+    this._MediamtxVideoPlayerFacade.dbClick(objSentToReferee);
+  }
+
+  createVideoElement(): void {
     if (this.videoPlayer && Hls.isSupported()) {
       let video = this.videoPlayer!.nativeElement;
       this.hls.loadSource(this.videoUrl);
@@ -214,18 +229,7 @@ export class MediamtxVideoPlayerComponent implements OnInit, AfterViewInit {
     }
     this.currentRate = rate;
   }
-  dbClick(): void {
-    let objSentToReferee = {
-      source: this.videoUrl,
-      isDbClick: true,
-      isPlay: !this.videoPlayer.nativeElement.paused,
-      currentTime: this.currentTime,
-      currentZoom: this.getZoomLevel(),
-      deltaY: this.deltaY,
-      rateValue: this.currentRate,
-    };
-    this.webSocketService!.sendMessage(objSentToReferee);
-  }
+  
   checkTypeOfScreen() {
     if (this.typeOfScreen === SCREENS.FOUR_SCREENS) {
       return 2;
@@ -345,4 +349,11 @@ export class MediamtxVideoPlayerComponent implements OnInit, AfterViewInit {
     this.renderer?.setStyle(this.videoPlayer?.nativeElement, 'top', `${currentTop + deltaY}px`);
   }
   //=====================STOP DRAG=====================
+
+
+  ngOnDestroy(): void {
+    if (this.hls) {
+      this.hls.destroy();
+    }
+  }
 }

@@ -1,12 +1,12 @@
 import { ElementRef, inject, Injectable } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { ComponentStore } from '@ngrx/component-store';
-import { SCREENS, SPEED_RO, TYPE_CONTROL } from "../../../../consts/system-contant";
-import { EndMatchDialogComponent } from "../../../../dialogs/end-match-dialog/end-match-dialog.component";
-import { HandleCurrentDurationTimeService } from "../../../../services/handle-current-duration-time.service";
-import { HandleSyncAllVideoService } from "../../../../services/handle-sync-all-video.service";
-import { LocService } from "../../../../services/loc-service.service";
-import { WebSocketService } from "../../../../services/web-socket.service";
+import { SCREENS, SPEED_RO, TYPE_CONTROL } from "../../../consts/system-contant";
+import { EndMatchDialogComponent } from "../../../dialogs/end-match-dialog/end-match-dialog.component";
+import { HandleCurrentDurationTimeService } from "../../../services/handle-current-duration-time.service";
+import { HandleSyncAllVideoService } from "../../../services/handle-sync-all-video.service";
+import { LocService } from "../../../services/loc-service.service";
+import { WebSocketService } from "../../../services/web-socket.service";
 
 export interface IHomeState {
     screenType: string;
