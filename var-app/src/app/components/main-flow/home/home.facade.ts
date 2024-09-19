@@ -248,12 +248,12 @@ export class HomeFacade extends ComponentStore<IHomeState> {
         this.controlAll(TYPE_CONTROL.SEEK_TIMELINE, undefined, currentTime);
         this.controlAll(TYPE_CONTROL.PAUSE);
         this.updateCurrentIsLive(false);
-        let objSentToReferee = {
-            isPlay: false,
-            currentTime: currentTime,
-            seekVideoPlayback: true,
-        };
-        this._webSocketService!.sendMessage(objSentToReferee);
+        // let objSentToReferee = {
+        //     isPlay: false,
+        //     currentTime: currentTime,
+        //     seekVideoPlayback: true,
+        // };
+        // this._webSocketService!.sendMessage(objSentToReferee);
     }
 
     getNewTimeWhenSeekHls(event: any, clientWidth: number) {
@@ -295,6 +295,10 @@ export class HomeFacade extends ComponentStore<IHomeState> {
         if (action === TYPE_CONTROL.LIVE) {
             this.updateCurrentIsLive(true);
             this._handleSyncAllVideoService?.sendSeekToLive(true);
+            this.controlAll(TYPE_CONTROL.PLAY);
+        }
+        if(action === TYPE_CONTROL.SEEK_TIMELINE) {
+            this._handleSyncAllVideoService?.sendTime(timelineValue);
         }
 
         document.querySelectorAll('.video-var').forEach((element: Element) => {
@@ -334,9 +338,6 @@ export class HomeFacade extends ComponentStore<IHomeState> {
                     break;
                 case TYPE_CONTROL.PLAY:
                     vid.play().catch(error => console.error('Error playing the video:', error));
-                    break;
-                case TYPE_CONTROL.SEEK_TIMELINE:
-                    vid.currentTime = timelineValue;
                     break;
             }
         });

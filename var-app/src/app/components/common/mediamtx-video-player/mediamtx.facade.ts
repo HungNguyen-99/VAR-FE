@@ -83,7 +83,7 @@ export class MediamtxVideoPlayerFacade extends ComponentStore<ImediamtxVideoPlay
                         if (this.get().isPlay) {
                             video.muted = true;
                             setTimeout(() => {
-                                isDoneInitial.emit(true);
+                                // isDoneInitial.emit(true);
                                 video.play();
                             }, 100);
                             this.updateIsPlay(false);
@@ -195,7 +195,7 @@ export class MediamtxVideoPlayerFacade extends ComponentStore<ImediamtxVideoPlay
     }
 
     handleSeekToLive(videoPlayer: ElementRef) {
-        this.updateIsPlay(true);
+        // this.updateIsPlay(true);
         videoPlayer.nativeElement.currentTime = videoPlayer.nativeElement.duration - 2;
         let objSentToReferee = {
             isPlay: true,
