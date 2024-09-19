@@ -1,44 +1,32 @@
 import { AfterViewInit, Component, ElementRef, EventEmitter, HostListener, inject, Input, OnInit, Output, Renderer2, ViewChild } from '@angular/core';
-import Hls, { Fragment } from 'hls.js';
-import { Subject, takeUntil, tap } from 'rxjs';
-import { HlsConfig } from '../../../consts/hls-config.const';
-import { SCREENS } from '../../../consts/system-contant';
 import { ObjDbClickSentToReferee } from '../../../interfaces';
-import { HandleCurrentDurationTimeService } from '../../../services/handle-current-duration-time.service';
-import { HandleSyncAllVideoService } from '../../../services/handle-sync-all-video.service';
 import { LocService } from '../../../services/loc-service.service';
 import { WebSocketService } from '../../../services/web-socket.service';
 import { MediamtxVideoPlayerFacade } from './mediamtx.facade';
+import { AsyncPipe, JsonPipe } from '@angular/common';
 @Component({
   selector: 'app-mediamtx-video-player',
   templateUrl: './mediamtx-video-player.component.html',
   styleUrls: ['./mediamtx-video-player.component.scss'],
   standalone: true,
-  imports: [],
+  imports: [AsyncPipe, JsonPipe],
   providers: [MediamtxVideoPlayerFacade]
 })
 export class MediamtxVideoPlayerComponent implements OnInit, AfterViewInit {
   @Input() videoUrl!: string;
-  @Input() id!: number;
   @Input() isReferee!: boolean;
   @Input() typeOfScreen!: string;
-  @Input() isRefresh!: boolean;
   @Output() isDoneInitial: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   @ViewChild('videoPlayer', { static: true }) videoPlayer!: ElementRef;
 
-  private readonly _MediamtxVideoPlayerFacade = inject(MediamtxVideoPlayerFacade);
+  readonly _mediamtxVideoPlayerFacade = inject(MediamtxVideoPlayerFacade);
+  readonly _webSocketService = inject(WebSocketService);
+  readonly _renderer = inject(Renderer2);
+  readonly _locService = inject(LocService);
 
-  private destroy$: Subject<void> = new Subject<void>();
-
-  videoId!: string;
-
-
-  isPlay = true;
-  public currentTime = 0;
-  currentRate = 'x1';
-  duration = 0;
   isDragging = false;
+  dragEnabled = false;
   startX = 0;
   startY = 0;
   maxZoomLevel = 5;
@@ -46,28 +34,18 @@ export class MediamtxVideoPlayerComponent implements OnInit, AfterViewInit {
   initialLeft = 0;
   initialTop = 0;
   deltaY = 0;
-  frags: Fragment[] = [];
-  dragEnabled: boolean = false;
-  constructor(
-    private _handleSyncAllVideoService?: HandleSyncAllVideoService,
-    private webSocketService?: WebSocketService,
-    private renderer?: Renderer2,
-    private locService?: LocService,
-  ) {
-  }
 
   ngOnInit(): void {
-    this.videoId = `video-container${this.id}`;
-    this._MediamtxVideoPlayerFacade.handleSubjectGetEmitData(this.videoPlayer);
-    this.locService?.layout$.subscribe((rs) => {
+    this._mediamtxVideoPlayerFacade.handleSubjectGetEmitData(this.videoPlayer);
+    this._locService?.layout$.subscribe((rs) => {
       if (rs) {
-        this.dragEnabled = rs.status;
+        this.dragEnabled = rs?.status;
       }
     });
   }
  
   ngAfterViewInit() {
-    this._MediamtxVideoPlayerFacade.createVideoElement(this.videoPlayer, this.videoUrl, this.isDoneInitial);
+    this._mediamtxVideoPlayerFacade.createVideoElement(this.videoPlayer, this.videoUrl, this.isDoneInitial);
   }
 
   dbClick(): void {
@@ -75,122 +53,13 @@ export class MediamtxVideoPlayerComponent implements OnInit, AfterViewInit {
       source: this.videoUrl,
       isDbClick: true,
       isPlay: !this.videoPlayer.nativeElement.paused,
-      currentTime: this.currentTime,
+      currentTime: this._mediamtxVideoPlayerFacade.currentTime,
       currentZoom: this.getZoomLevel(),
       deltaY: this.deltaY,
-      rateValue: this.currentRate,
+      rateValue: this._mediamtxVideoPlayerFacade.currentRate,
     };
-    this._MediamtxVideoPlayerFacade.dbClick(objSentToReferee);
+    this._mediamtxVideoPlayerFacade.dbClick(objSentToReferee);
   }
-
-  // handleSubjectGetEmitData() {
-  //   this._handleSyncAllVideoService
-  //     ?.getTime()
-  //     .pipe(
-  //       takeUntil(this.destroy$),
-  //       tap((res) => {
-  //         this.setTime(res);
-  //       })
-  //     )
-  //     .subscribe();
-
-  //   this._handleSyncAllVideoService
-  //     ?.getPauseOrPlay()
-  //     .pipe(
-  //       takeUntil(this.destroy$),
-  //       tap((res) => {
-  //         this.handlePauseOrPlay();
-  //       })
-  //     )
-  //     .subscribe();
-
-  //   this._handleSyncAllVideoService
-  //     ?.getSeekToLive()
-  //     .pipe(
-  //       takeUntil(this.destroy$),
-  //       tap((res) => {
-  //         this.handleSeekToLive();
-  //       })
-  //     )
-  //     .subscribe();
-
-  //   this._handleSyncAllVideoService
-  //     ?.getPlayBackRate()
-  //     .pipe(
-  //       takeUntil(this.destroy$),
-  //       tap((res) => {
-  //         this.playbackRate(res);
-  //       })
-  //     )
-  //     .subscribe();
-  // }
-
-  // handleSeekToLive() {
-  //   this.isPlay = true;
-  //   this.videoPlayer.nativeElement.currentTime = this.videoPlayer.nativeElement.duration - 2;
-  //   let objSentToReferee = {
-  //     isPlay: true,
-  //     currentTime: this.videoPlayer.nativeElement.currentTime,
-  //     seekVideoPlayback: true,
-  //   };
-  //   this.webSocketService!.sendMessage(objSentToReferee);
-  // }
-
-  // handlePauseOrPlay() {
-  //   const video = this.videoPlayer.nativeElement;
-  //   if (!video.paused) {
-  //     const thePromise = video.play();
-  //     if (thePromise !== undefined) {
-  //       thePromise.then(() => {
-  //         video.pause();
-  //         let objSentToReferee = {
-  //           isPlay: !video.paused,
-  //           pauseOrPlayFlag: true,
-  //           currentTime: video.currentTime,
-  //         };
-  //         this.webSocketService!.sendMessage(objSentToReferee);
-  //       });
-  //     }
-  //   } else {
-  //     video.play();
-  //     let objSentToReferee = {
-  //       isPlay: !video.paused,
-  //       pauseOrPlayFlag: true,
-  //       currentTime: video.currentTime,
-  //     };
-  //     this.webSocketService!.sendMessage(objSentToReferee);
-  //   }
-  // }
-
-  // setTime(time: number) {
-  //   this.isPlay = false;
-  //   this.videoPlayer.nativeElement.currentTime = time;
-  // }
-
-
-  // playbackRate(rate: string) {
-  //   switch (rate) {
-  //     case 'x0.1':
-  //       this.videoPlayer.nativeElement.playbackRate = 0.1;
-  //       break;
-  //     case 'x0.5':
-  //       this.videoPlayer.nativeElement.playbackRate = 0.5;
-  //       break;
-  //     default:
-  //       this.videoPlayer.nativeElement.playbackRate = 1;
-  //   }
-  //   this.currentRate = rate;
-  // }
-  
-  // checkTypeOfScreen() {
-  //   if (this.typeOfScreen === SCREENS.FOUR_SCREENS) {
-  //     return 2;
-  //   } else if (this.typeOfScreen === SCREENS.NINE_SCREENS) {
-  //     return 3;
-  //   } else {
-  //     return 1;
-  //   }
-  // }
 
   //=====================START ZOOM=====================
   @HostListener('wheel', ['$event'])
@@ -210,7 +79,7 @@ export class MediamtxVideoPlayerComponent implements OnInit, AfterViewInit {
         deltaY: event.deltaY,
         currentZoom: event?.currentZoom
       };
-      this.webSocketService!.sendMessage(objSentToReferee);
+      this._webSocketService!.sendMessage(objSentToReferee);
     }
   }
 
@@ -238,26 +107,27 @@ export class MediamtxVideoPlayerComponent implements OnInit, AfterViewInit {
   }
 
   private setZoomLevel(zoomLevel: number): void {
-    this.renderer?.setStyle(this.videoPlayer?.nativeElement, 'transform', `scale(${zoomLevel})`);
+    this._renderer?.setStyle(this.videoPlayer?.nativeElement, 'transform', `scale(${zoomLevel})`);
   }
 
   resetPosition(): void {
-    this.renderer?.setStyle(this.videoPlayer?.nativeElement, 'left', `${this.initialLeft}px`);
-    this.renderer?.setStyle(this.videoPlayer?.nativeElement, 'top', `${this.initialTop}px`);
+    this._renderer?.setStyle(this.videoPlayer?.nativeElement, 'left', `${this.initialLeft}px`);
+    this._renderer?.setStyle(this.videoPlayer?.nativeElement, 'top', `${this.initialTop}px`);
   }
-
-  //=====================END ZOOM=======================
 
   //=====================START DRAG=====================
   @HostListener('mousedown', ['$event'])
   onMouseDown(event: MouseEvent): void {
+    if(!this.dragEnabled){
+       return;
+    }
     this.isDragging = true;
     this.startX = event.clientX;
     this.startY = event.clientY;
     this.videoPlayer.nativeElement.style.cursor = 'grabbing'; // Change cursor to grabbing
     event.preventDefault(); // Prevent default to stop text selection
 
-    this.webSocketService?.sendMessage(
+    this._webSocketService?.sendMessage(
       {
         isPlay: false,
         typeOfAction: 'onMouseDown',
@@ -269,20 +139,26 @@ export class MediamtxVideoPlayerComponent implements OnInit, AfterViewInit {
 
   @HostListener('document:mouseup')
   onMouseUp(): void {
+    if(!this.dragEnabled){
+      return;
+   }
     this.isDragging = false;
     this.videoPlayer.nativeElement.style.cursor = 'grab'; // Change cursor back to grab
   }
 
   @HostListener('document:mousemove', ['$event'])
   onMouseMove(event: MouseEvent): void {
+    if(!this.dragEnabled){
+      return;
+   }
     if (this.isDragging) {
-      this.webSocketService?.sendMessage(
+      this._webSocketService?.sendMessage(
         {
           isPlay: false,
           typeOfAction: 'onMouseMove',
           clientX: event.clientX,
           clientY: event.clientY,
-          typeOfScreen: this._MediamtxVideoPlayerFacade.checkTypeOfScreen() 
+          typeOfScreen: this._mediamtxVideoPlayerFacade.checkTypeOfScreen() 
         }
       )
 
@@ -297,9 +173,8 @@ export class MediamtxVideoPlayerComponent implements OnInit, AfterViewInit {
   public adjustVideoPosition(deltaX: number, deltaY: number): void {
     const currentLeft = parseFloat(getComputedStyle(this.videoPlayer?.nativeElement).left) || 0;
     const currentTop = parseFloat(getComputedStyle(this.videoPlayer?.nativeElement).top) || 0;
-    this.renderer?.setStyle(this.videoPlayer?.nativeElement, 'left', `${currentLeft + deltaX}px`);
-    this.renderer?.setStyle(this.videoPlayer?.nativeElement, 'top', `${currentTop + deltaY}px`);
+    this._renderer?.setStyle(this.videoPlayer?.nativeElement, 'left', `${currentLeft + deltaX}px`);
+    this._renderer?.setStyle(this.videoPlayer?.nativeElement, 'top', `${currentTop + deltaY}px`);
   }
-  //=====================STOP DRAG=====================
 
 }

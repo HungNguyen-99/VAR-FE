@@ -50,6 +50,17 @@ export class MediamtxVideoPlayerFacade extends ComponentStore<ImediamtxVideoPlay
     readonly currentRate$ = this.select(state => state.currentRate);
     readonly typeOfScreen$ = this.select(state => state.typeOfScreen);
 
+    readonly vm$ = this.select({
+    });
+
+    get currentTime(): number {
+        return this.get().currentTime;
+    }
+
+    get currentRate(): string {
+        return this.get().currentRate;
+    }
+
     dbClick(objSentToReferee: ObjDbClickSentToReferee): void {
         this._webSocketService!.sendMessage(objSentToReferee);
     }

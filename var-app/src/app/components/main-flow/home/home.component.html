@@ -7,7 +7,7 @@
 
     <div class="content-4" *ngIf="vm.screenType === 'x4'">
         <div class="content-4__item" *ngFor="let video of vm.videoX4; let i = index">
-            <app-mediamtx-video-player *ngIf="video" [videoUrl]="video" [id]="i"
+            <app-mediamtx-video-player *ngIf="video" [videoUrl]="video"
                 [typeOfScreen]="vm.screenType" />
             <div class="err-container" *ngIf="!video">
                 <div class="error-camera">
@@ -24,7 +24,7 @@
 
     <div class="content-9" *ngIf="vm.screenType === 'x9'">
         <div class="content-9__item" *ngFor="let video of vm.videos; let i = index">
-            <app-mediamtx-video-player *ngIf="video" [videoUrl]="video" [id]="i"
+            <app-mediamtx-video-player *ngIf="video" [videoUrl]="video"
                 [typeOfScreen]="vm.screenType"></app-mediamtx-video-player>
 
             <div class="err-container" *ngIf="!video">
@@ -39,7 +39,7 @@
         <div class="content-1">
             <div class="item-1" [ngClass]="vm.indexForClassContainerX1 === i ? 'is-selected' : ''" #videoContainer
                 *ngFor="let video of vm.videosForOneView; let i = index" (click)="homeFacade.changeSourceVideoOne(i)">
-                <app-mediamtx-video-player *ngIf="video" [videoUrl]="video" [id]="i"></app-mediamtx-video-player>
+                <app-mediamtx-video-player *ngIf="video" [videoUrl]="video"></app-mediamtx-video-player>
             </div>
         </div>
         <div class="content-2">
