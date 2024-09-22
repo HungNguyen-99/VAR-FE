@@ -2,11 +2,11 @@ import { BreakpointObserver } from "@angular/cdk/layout";
 import { NgIf } from "@angular/common";
 import { Component, ViewChild } from "@angular/core";
 import { MatSidenav } from "@angular/material/sidenav";
-import { LocService } from "../../../services/loc-service.service";
+import { LocService } from "../../services/loc-service.service";
 import { MatDialog } from "@angular/material/dialog";
-import { ConfigurationComponent } from "../../../dialogs/configuration/configuration.component";
+import { ConfigurationComponent } from "../../dialogs/configuration/configuration.component";
 import { RouterOutlet } from "@angular/router";
-import { MATERIAL_MODULE } from "../../../consts/material.const";
+import { MATERIAL_MODULE } from "../../consts/material.const";
 
 @Component({
     selector: 'app-layout',

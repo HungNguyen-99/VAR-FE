@@ -11,10 +11,12 @@ import { WebSocketService } from '../../../services/web-socket.service';
 import { FloatingMenuComponent } from '../../common/floating-menu/floating-menu.component';
 import { MediamtxVideoPlayerComponent } from '../../common/mediamtx-video-player/mediamtx-video-player.component';
 import { HomeFacade } from './home.facade';
+import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop';
+
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [FloatingMenuComponent, NgIf, NgFor, NgClass, MediamtxVideoPlayerComponent, MATERIAL_MODULE, AsyncPipe, HandleWidthOfTimeLinePipe, TranslateCurrentDurationPipe],
+  imports: [FloatingMenuComponent, NgIf, NgFor, NgClass, MediamtxVideoPlayerComponent, MATERIAL_MODULE, AsyncPipe, HandleWidthOfTimeLinePipe, TranslateCurrentDurationPipe, DragDropModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
   providers: [HomeFacade]

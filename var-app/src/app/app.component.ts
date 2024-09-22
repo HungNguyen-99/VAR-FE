@@ -4,7 +4,7 @@ import { LoadingScreenComponent } from './components/common/loading-screen/loadi
 import { NgIf } from '@angular/common';
 import { CreateMatchComponent } from './components/common/create-match/create-match.component';
 import { MATERIAL_MODULE } from './consts/material.const';
-import { LayoutComponent } from './components/common/layout/layout.component';
+import { LayoutComponent } from './components/layout/layout.component';
 import { LocService } from './services/loc-service.service';
 import { tap } from 'rxjs';
 
@@ -51,13 +51,13 @@ export class AppComponent {
   getFormInfo(data: any) {
     console.log(data);
     this.isSubmitted = true;
-    sessionStorage.setItem('START_TIME', Date.now().toString());
+    localStorage.setItem('START_TIME', Date.now().toString());
   }
 
   endTheMatchEvent(){
     this.locService.endTheMatchEvent$.pipe(
       tap(() => {
-        sessionStorage.clear();
+        localStorage.clear();
         this.isExpired();
       })
     ).subscribe();
@@ -65,12 +65,12 @@ export class AppComponent {
 
   isExpired() {
     const now = Date.now();
-    const startTime = sessionStorage.getItem('START_TIME');
+    const startTime = localStorage.getItem('START_TIME');
     const duration = 90 * 60 * 1000; // 1 minute
     if (startTime && duration && (now - (+startTime) < duration)) {
       this.isSubmitted = true;
     }else {
-      sessionStorage.clear();
+      localStorage.clear();
       this.isSubmitted = false;
     }
   }

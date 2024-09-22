@@ -7,6 +7,7 @@ export class HandleCurrentDurationTimeService {
 
     private _currentTime: number = 0;
     private _duration: number = 0;
+    private _isPause: boolean = true;
 
     public get currentTime(): number {
         return this._currentTime;
@@ -22,5 +23,13 @@ export class HandleCurrentDurationTimeService {
 
     public set duration(value: number) {
         this._duration = value;
+    }
+
+    public get isPause(): boolean {
+        return this._isPause;
+    }
+
+    public set isPause(value: boolean) {
+        this._isPause = value;
     }
 }

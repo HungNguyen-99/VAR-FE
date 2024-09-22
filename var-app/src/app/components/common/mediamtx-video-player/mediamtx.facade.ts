@@ -77,6 +77,7 @@ export class MediamtxVideoPlayerFacade extends ComponentStore<ImediamtxVideoPlay
                         this.updateDuration(video.duration);
                         this.handleCurrentDurationTimeService.currentTime = video.currentTime;
                         this.handleCurrentDurationTimeService.duration = video.duration;
+                        this.handleCurrentDurationTimeService.isPause = video.paused;
                         this._handleSyncAllVideoService?.sendDoneUpdateTime(true);
                     });
                     video.addEventListener('canplay', () => {

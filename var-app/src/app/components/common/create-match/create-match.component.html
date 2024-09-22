@@ -1,23 +1,22 @@
 <div class="background">
-    <!-- <div class="cover-screen"></div> -->
+    <div class="cover-screen"></div>
     <div class="modal" *ngIf="!confirmStep">
         <div class="header">
             <h3 class="title">Khởi tạo trận đấu</h3>
-            <span class="close-button" (click)="closeModal()">&times;</span>
         </div>
         <div class="modal-content">
             <form (ngSubmit)="onCreate()">
                 <div class="form-group">
                     <label for="match-name">Trận đấu:</label>
-                    <input type="text" id="match-name" [(ngModel)]="match.name" name="match-name" required placeholder="Nhập tên trận đấu">
+                    <input type="text" [style.border]="'none'" id="match-name" [(ngModel)]="match.name" name="match-name" required placeholder="Nhập tên trận đấu">
                 </div>
                 <div class="form-group">
                     <label for="match-time">Giờ thi đấu:</label>
-                    <input type="time" id="match-time" [(ngModel)]="match.time" name="match-time" required placeholder="Chọn giờ thi đấu">
+                    <input type="time" [style.border]="'none'" id="match-time" [(ngModel)]="match.time" name="match-time" required placeholder="Chọn giờ thi đấu">
                 </div>
                 <div class="form-group">
                     <label for="stadium-name">Sân đấu:</label>
-                    <input type="text" id="stadium-name" [(ngModel)]="match.stadium" name="stadium-name" placeholder="Nhập tên sân đấu">
+                    <input type="text" [style.border]="'none'" id="stadium-name" [(ngModel)]="match.stadium" name="stadium-name" placeholder="Nhập tên sân đấu">
                 </div>
                 <button type="submit">Tạo trận đấu</button>
             </form>
@@ -27,7 +26,6 @@
     <div class="modal" *ngIf="confirmStep">
         <div class="header">
             <h3 class="title">Xác nhận trận đấu</h3>
-            <span class="close-button" (click)="closeModal()">&times;</span>
         </div> 
         <div class="modal-body">
           <div class="form-group-view">

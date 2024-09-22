@@ -202,6 +202,8 @@ export class HomeFacade extends ComponentStore<IHomeState> {
     }
 
     nextVideoX4() {
+        const currentTime = structuredClone( this._handleCurrentDurationTimeService.currentTime);
+        const isPause = structuredClone( this._handleCurrentDurationTimeService.isPause);
         let currentIndexVideoX4 = this.get().currentIndexVideoX4;
         this.updateCurrentIndexVideoX4(currentIndexVideoX4 += 1);
         if (this.get().currentIndexVideoX4 > 1) {
@@ -215,11 +217,21 @@ export class HomeFacade extends ComponentStore<IHomeState> {
             videoX4.push('');
         }
         this.updateCurrentVideoX4(videoX4);
-        this.controlAll(TYPE_CONTROL.SEEK_TIMELINE, undefined, this._handleCurrentDurationTimeService.currentTime);
+        setTimeout(() => {
+            this._handleSyncAllVideoService?.sendTime(currentTime);
+            setTimeout(() => {
+                if(isPause){
+                    this.controlAll(TYPE_CONTROL.PAUSE);
+                }else{
+                    this.controlAll(TYPE_CONTROL.PLAY);
+                }
+            }, 100);
+        }, 0);
     }
 
     previousVideoX4() {
-
+        const currentTime = structuredClone( this._handleCurrentDurationTimeService.currentTime);
+        const isPause = structuredClone( this._handleCurrentDurationTimeService.isPause);
         let currentIndexVideoX4 = this.get().currentIndexVideoX4;
         this.updateCurrentIndexVideoX4(currentIndexVideoX4 -= 1);
         if (this.get().currentIndexVideoX4 < 0) {
@@ -233,6 +245,14 @@ export class HomeFacade extends ComponentStore<IHomeState> {
             videoX4.push('');
         }
         this.updateCurrentVideoX4(videoX4);
+        setTimeout(() => {
+            this._handleSyncAllVideoService?.sendTime(currentTime);
+            if(isPause){
+                this.controlAll(TYPE_CONTROL.PAUSE);
+            }else{
+                this.controlAll(TYPE_CONTROL.PLAY);
+            }
+        }, 100);
     }
 
     changeSourceVideoOne(index: number) {
@@ -248,12 +268,12 @@ export class HomeFacade extends ComponentStore<IHomeState> {
         this.controlAll(TYPE_CONTROL.SEEK_TIMELINE, undefined, currentTime);
         this.controlAll(TYPE_CONTROL.PAUSE);
         this.updateCurrentIsLive(false);
-        // let objSentToReferee = {
-        //     isPlay: false,
-        //     currentTime: currentTime,
-        //     seekVideoPlayback: true,
-        // };
-        // this._webSocketService!.sendMessage(objSentToReferee);
+        let objSentToReferee = {
+            isPlay: false,
+            currentTime: currentTime,
+            seekVideoPlayback: true,
+        };
+        this._webSocketService!.sendMessage(objSentToReferee);
     }
 
     getNewTimeWhenSeekHls(event: any, clientWidth: number) {

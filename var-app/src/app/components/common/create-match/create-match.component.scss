@@ -40,9 +40,13 @@
     font-family: system-ui;
 
     ::placeholder {
-        color: white;
+        color: #FFFFFF;
         opacity: 1;
-        /* Firefox */
+        font-family: Open Sans;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 24px;
+        text-align: left;
     }
 
     ::-ms-input-placeholder {
@@ -132,6 +136,12 @@ button {
     width: 90%;
     margin: 0;
     // margin-top: 1rem;
+    //styleName: Label/Label 2;
+    font-family: Open Sans;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 32.68px;
+    text-align: left;
 }
 
 .close-button {

@@ -1,6 +1,5 @@
 * {
     box-sizing: border-box;
-    // overflow: hidden;
 }
 
 @mixin item {
@@ -24,11 +23,13 @@
 }
 
 .body {
-    overflow: hidden;
+    overflow: hidden !important;	
     height: calc(100vh);
     display: grid;
     grid-template-columns: 1fr;
     grid-template-rows: auto;
+    position: relative;
+    
 
     .content-4 {
         display: grid;
@@ -178,7 +179,7 @@
 
             .time-tooltip {
                 margin-left: 15px;
-                width: 62px;
+                width: 100px;
                 height: 22px;
                 background: white;
                 color: black;
@@ -201,7 +202,7 @@
         top: 50%;
         transform: translate(0, -50%);
         width: fit-content;
-        z-index: 102;
+        z-index: 999;
     }
 }
 
