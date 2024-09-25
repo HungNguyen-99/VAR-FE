@@ -6,66 +6,25 @@ import Hls from "hls.js";
 import { HlsConfig } from "../../../consts/hls-config.const";
 import { HandleCurrentDurationTimeService } from "../../../services/handle-current-duration-time.service";
 import { HandleSyncAllVideoService } from "../../../services/handle-sync-all-video.service";
-import { takeUntil, tap } from "rxjs";
+import { Subject, takeUntil, tap } from "rxjs";
 import { SCREENS } from "../../../consts/system-contant";
 
-interface ImediamtxVideoPlayerState {
-    currentTime: number;
-    duration: number;
-    isPlay: boolean;
-    currentRate: string;
-    typeOfScreen: string;
-}
-
-const initialState: ImediamtxVideoPlayerState = {
-    currentTime: 0,
-    duration: 0,
-    isPlay: true,
-    currentRate: 'x1',
-    typeOfScreen: SCREENS.FOUR_SCREENS
-};
-
 @Injectable()
-export class MediamtxVideoPlayerFacade extends ComponentStore<ImediamtxVideoPlayerState> {
+export class MediamtxVideoPlayerFacade {
 
     private readonly _webSocketService = inject(WebSocketService);
-    private readonly handleCurrentDurationTimeService = inject(HandleCurrentDurationTimeService);
+    private readonly _handleCurrentDurationTimeService = inject(HandleCurrentDurationTimeService);
     private readonly _handleSyncAllVideoService = inject(HandleSyncAllVideoService);
 
-    private readonly hls = new Hls(HlsConfig);
-
-    constructor() {
-        super(initialState);
-    }
-
-    readonly updateCurrentTime = this.updater((state, currentTime: number) => ({ ...state, currentTime }));
-    readonly updateDuration = this.updater((state, duration: number) => ({ ...state, duration }));
-    readonly updateIsPlay = this.updater((state, isPlay: boolean) => ({ ...state, isPlay }));
-    readonly updateCurrentRate = this.updater((state, currentRate: string) => ({ ...state, currentRate }));
-    readonly updateTypeOfScreen = this.updater((state, typeOfScreen: string) => ({ ...state, typeOfScreen }));
-
-    readonly currentTime$ = this.select(state => state.currentTime);
-    readonly duration$ = this.select(state => state.duration);
-    readonly isPlay$ = this.select(state => state.isPlay);
-    readonly currentRate$ = this.select(state => state.currentRate);
-    readonly typeOfScreen$ = this.select(state => state.typeOfScreen);
-
-    readonly vm$ = this.select({
-    });
-
-    get currentTime(): number {
-        return this.get().currentTime;
-    }
-
-    get currentRate(): string {
-        return this.get().currentRate;
-    }
+    public readonly hls = new Hls(HlsConfig);
+    private isPlay: boolean = true;
+    private readonly destroy$ = new Subject();
 
     dbClick(objSentToReferee: ObjDbClickSentToReferee): void {
         this._webSocketService!.sendMessage(objSentToReferee);
     }
 
-    createVideoElement(videoPlayer: ElementRef, videoUrl: string, isDoneInitial: EventEmitter<boolean>): void {
+    createVideoElement(videoPlayer: ElementRef, videoUrl: string): void {
         if (videoPlayer && Hls.isSupported()) {
             let video = videoPlayer!.nativeElement;
             this.hls.loadSource(videoUrl);
@@ -73,23 +32,18 @@ export class MediamtxVideoPlayerFacade extends ComponentStore<ImediamtxVideoPlay
             this.hls.on(Hls.Events.MEDIA_ATTACHED, () => {
                 if (videoPlayer) {
                     video.addEventListener('timeupdate', () => {
-                        this.updateCurrentTime(video.currentTime);
-                        this.updateDuration(video.duration);
-                        this.handleCurrentDurationTimeService.currentTime = video.currentTime;
-                        this.handleCurrentDurationTimeService.duration = video.duration;
-                        this.handleCurrentDurationTimeService.isPause = video.paused;
+                        this._handleCurrentDurationTimeService.currentTime = video.currentTime;
+                        this._handleCurrentDurationTimeService.duration = video.duration;
+                        this._handleCurrentDurationTimeService.isPause = video.paused;
                         this._handleSyncAllVideoService?.sendDoneUpdateTime(true);
                     });
                     video.addEventListener('canplay', () => {
-                        if (this.get().isPlay) {
+                        if (this.isPlay) {
                             video.muted = true;
                             setTimeout(() => {
-                                // isDoneInitial.emit(true);
                                 video.play();
                             }, 100);
-                            this.updateIsPlay(false);
-                        } else {
-                            // video.pause();
+                            this.isPlay = false;
                         }
                     });
                 }
@@ -104,7 +58,6 @@ export class MediamtxVideoPlayerFacade extends ComponentStore<ImediamtxVideoPlay
                 this.hls.currentLevel = lowestQualityLevel;
                 video.play();
             });
-            this.hls.on(Hls.Events.FRAG_LOADED, () => { });
         }
     }
 
@@ -151,7 +104,7 @@ export class MediamtxVideoPlayerFacade extends ComponentStore<ImediamtxVideoPlay
     }
 
     setTime(time: number, videoPlayer: ElementRef) {
-        this.updateIsPlay(false);
+        this.isPlay = false;
         videoPlayer.nativeElement.currentTime = time;
     }
 
@@ -192,11 +145,10 @@ export class MediamtxVideoPlayerFacade extends ComponentStore<ImediamtxVideoPlay
             default:
                 videoPlayer.nativeElement.playbackRate = 1;
         }
-        this.updateCurrentRate(rate);
+        this._handleCurrentDurationTimeService.currentRate = rate;
     }
 
     handleSeekToLive(videoPlayer: ElementRef) {
-        // this.updateIsPlay(true);
         videoPlayer.nativeElement.currentTime = videoPlayer.nativeElement.duration - 2;
         let objSentToReferee = {
             isPlay: true,
@@ -206,10 +158,10 @@ export class MediamtxVideoPlayerFacade extends ComponentStore<ImediamtxVideoPlay
         this._webSocketService!.sendMessage(objSentToReferee);
     }
 
-    checkTypeOfScreen() {
-        if (this.get().typeOfScreen === SCREENS.FOUR_SCREENS) {
+    checkTypeOfScreen(typeOfScreen: string) {
+        if (typeOfScreen === SCREENS.FOUR_SCREENS) {
             return 2;
-        } else if (this.get().typeOfScreen === SCREENS.NINE_SCREENS) {
+        } else if (typeOfScreen === SCREENS.NINE_SCREENS) {
             return 3;
         } else {
             return 1;

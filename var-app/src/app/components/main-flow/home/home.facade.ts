@@ -30,7 +30,7 @@ const initialState: IHomeState = {
     videos: [],
     videoX4: [],
     videosForOneView: [],
-    isLive: false,
+    isLive: true,
     currentIndexVideoX4: 0,
     screen1: true,
     indexForClassContainerX1: 0,
@@ -202,8 +202,8 @@ export class HomeFacade extends ComponentStore<IHomeState> {
     }
 
     nextVideoX4() {
-        const currentTime = structuredClone( this._handleCurrentDurationTimeService.currentTime);
-        const isPause = structuredClone( this._handleCurrentDurationTimeService.isPause);
+        const currentTime = structuredClone(this._handleCurrentDurationTimeService.currentTime);
+        const isPause = structuredClone(this._handleCurrentDurationTimeService.isPause);
         let currentIndexVideoX4 = this.get().currentIndexVideoX4;
         this.updateCurrentIndexVideoX4(currentIndexVideoX4 += 1);
         if (this.get().currentIndexVideoX4 > 1) {
@@ -220,9 +220,9 @@ export class HomeFacade extends ComponentStore<IHomeState> {
         setTimeout(() => {
             this._handleSyncAllVideoService?.sendTime(currentTime);
             setTimeout(() => {
-                if(isPause){
+                if (isPause) {
                     this.controlAll(TYPE_CONTROL.PAUSE);
-                }else{
+                } else {
                     this.controlAll(TYPE_CONTROL.PLAY);
                 }
             }, 100);
@@ -230,8 +230,8 @@ export class HomeFacade extends ComponentStore<IHomeState> {
     }
 
     previousVideoX4() {
-        const currentTime = structuredClone( this._handleCurrentDurationTimeService.currentTime);
-        const isPause = structuredClone( this._handleCurrentDurationTimeService.isPause);
+        const currentTime = structuredClone(this._handleCurrentDurationTimeService.currentTime);
+        const isPause = structuredClone(this._handleCurrentDurationTimeService.isPause);
         let currentIndexVideoX4 = this.get().currentIndexVideoX4;
         this.updateCurrentIndexVideoX4(currentIndexVideoX4 -= 1);
         if (this.get().currentIndexVideoX4 < 0) {
@@ -247,9 +247,9 @@ export class HomeFacade extends ComponentStore<IHomeState> {
         this.updateCurrentVideoX4(videoX4);
         setTimeout(() => {
             this._handleSyncAllVideoService?.sendTime(currentTime);
-            if(isPause){
+            if (isPause) {
                 this.controlAll(TYPE_CONTROL.PAUSE);
-            }else{
+            } else {
                 this.controlAll(TYPE_CONTROL.PLAY);
             }
         }, 100);
@@ -265,7 +265,7 @@ export class HomeFacade extends ComponentStore<IHomeState> {
 
     seekVideoPlaybackHls(event: any, clientWidth: number) {
         let currentTime = this.getNewTimeWhenSeekHls(event, clientWidth);
-        this.controlAll(TYPE_CONTROL.SEEK_TIMELINE, undefined, currentTime);
+        this._handleSyncAllVideoService?.sendTime(currentTime);
         this.controlAll(TYPE_CONTROL.PAUSE);
         this.updateCurrentIsLive(false);
         let objSentToReferee = {
@@ -274,6 +274,12 @@ export class HomeFacade extends ComponentStore<IHomeState> {
             seekVideoPlayback: true,
         };
         this._webSocketService!.sendMessage(objSentToReferee);
+    }
+
+    seekToLive() {
+        this.updateCurrentIsLive(true);
+        this._handleSyncAllVideoService?.sendSeekToLive(true);
+        this.controlAll(TYPE_CONTROL.PLAY);
     }
 
     getNewTimeWhenSeekHls(event: any, clientWidth: number) {
@@ -312,15 +318,6 @@ export class HomeFacade extends ComponentStore<IHomeState> {
     }
 
     controlAll(action: string, timeRo?: number, timelineValue?: any): void {
-        if (action === TYPE_CONTROL.LIVE) {
-            this.updateCurrentIsLive(true);
-            this._handleSyncAllVideoService?.sendSeekToLive(true);
-            this.controlAll(TYPE_CONTROL.PLAY);
-        }
-        if(action === TYPE_CONTROL.SEEK_TIMELINE) {
-            this._handleSyncAllVideoService?.sendTime(timelineValue);
-        }
-
         document.querySelectorAll('.video-var').forEach((element: Element) => {
             const vid = element as HTMLVideoElement;
             switch (action) {

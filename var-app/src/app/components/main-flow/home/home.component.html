@@ -66,7 +66,7 @@
             </div>
         </div>
         <div class="time-display">
-            <div style="cursor: pointer" (click)="homeFacade.controlAll('live')">
+            <div style="cursor: pointer" (click)="homeFacade.seekToLive()">
                 <div class="btn-live btn-live-on" *ngIf="vm.isLive"></div>
                 <div class="btn-live btn-live-off" *ngIf="!vm.isLive"></div>
                 {{ 'Trực tiếp' }}

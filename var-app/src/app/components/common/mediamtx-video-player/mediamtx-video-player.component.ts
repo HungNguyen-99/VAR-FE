@@ -4,6 +4,7 @@ import { LocService } from '../../../services/loc-service.service';
 import { WebSocketService } from '../../../services/web-socket.service';
 import { MediamtxVideoPlayerFacade } from './mediamtx.facade';
 import { AsyncPipe, JsonPipe } from '@angular/common';
+import { HandleCurrentDurationTimeService } from '../../../services/handle-current-duration-time.service';
 @Component({
   selector: 'app-mediamtx-video-player',
   templateUrl: './mediamtx-video-player.component.html',
@@ -16,11 +17,11 @@ export class MediamtxVideoPlayerComponent implements OnInit, AfterViewInit {
   @Input() videoUrl!: string;
   @Input() isReferee!: boolean;
   @Input() typeOfScreen!: string;
-  @Output() isDoneInitial: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   @ViewChild('videoPlayer', { static: true }) videoPlayer!: ElementRef;
 
   readonly _mediamtxVideoPlayerFacade = inject(MediamtxVideoPlayerFacade);
+  private readonly _handleCurrentDurationTimeService = inject(HandleCurrentDurationTimeService);
   readonly _webSocketService = inject(WebSocketService);
   readonly _renderer = inject(Renderer2);
   readonly _locService = inject(LocService);
@@ -45,7 +46,13 @@ export class MediamtxVideoPlayerComponent implements OnInit, AfterViewInit {
   }
  
   ngAfterViewInit() {
-    this._mediamtxVideoPlayerFacade.createVideoElement(this.videoPlayer, this.videoUrl, this.isDoneInitial);
+    this._mediamtxVideoPlayerFacade.createVideoElement(this.videoPlayer, this.videoUrl);
+  }
+
+  ngOnDestroy(): void {
+    if (this._mediamtxVideoPlayerFacade.hls) {
+      this._mediamtxVideoPlayerFacade.hls.destroy();
+    }
   }
 
   dbClick(): void {
@@ -53,10 +60,10 @@ export class MediamtxVideoPlayerComponent implements OnInit, AfterViewInit {
       source: this.videoUrl,
       isDbClick: true,
       isPlay: !this.videoPlayer.nativeElement.paused,
-      currentTime: this._mediamtxVideoPlayerFacade.currentTime,
+      currentTime: this._handleCurrentDurationTimeService.currentTime,
       currentZoom: this.getZoomLevel(),
       deltaY: this.deltaY,
-      rateValue: this._mediamtxVideoPlayerFacade.currentRate,
+      rateValue: this._handleCurrentDurationTimeService.currentRate,
     };
     this._mediamtxVideoPlayerFacade.dbClick(objSentToReferee);
   }
@@ -158,7 +165,7 @@ export class MediamtxVideoPlayerComponent implements OnInit, AfterViewInit {
           typeOfAction: 'onMouseMove',
           clientX: event.clientX,
           clientY: event.clientY,
-          typeOfScreen: this._mediamtxVideoPlayerFacade.checkTypeOfScreen() 
+          typeOfScreen: this._mediamtxVideoPlayerFacade.checkTypeOfScreen(this.typeOfScreen) 
         }
       )
 

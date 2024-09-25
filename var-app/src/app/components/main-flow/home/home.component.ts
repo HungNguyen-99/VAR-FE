@@ -82,7 +82,7 @@ export class HomeComponent implements OnInit {
 
   @HostListener('window:keydown.meta.shift.l', ['$event']) //SEEK TO LIVE BY RO
   onWindowShiftKeyL(event: KeyboardEvent) {
-    this.homeFacade.controlAll(TYPE_CONTROL.LIVE);
+    this.homeFacade.seekToLive();
   }
 
   @HostListener('window:keydown.meta.shift.d', ['$event']) //MARK ON TIMELINE BY RO

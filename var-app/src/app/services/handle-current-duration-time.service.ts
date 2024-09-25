@@ -7,6 +7,7 @@ export class HandleCurrentDurationTimeService {
 
     private _currentTime: number = 0;
     private _duration: number = 0;
+    private _currentRate: string = 'x1';
     private _isPause: boolean = true;
 
     public get currentTime(): number {
@@ -31,5 +32,13 @@ export class HandleCurrentDurationTimeService {
 
     public set isPause(value: boolean) {
         this._isPause = value;
+    }
+
+    public get currentRate(): string {
+        return this._currentRate;
+    }
+
+    public set currentRate(value: string) {
+        this._currentRate = value;
     }
 }
