@@ -46,6 +46,7 @@
             <div #videoContainer>
                 <app-mediamtx-video-player *ngIf="vm.screen1"
                     [videoUrl]="vm.videosForOneView[vm.indexForClassContainerX1]"
+                    [currentTimeX1]="_handleCurrentDurationTimeService.currentTime"
                     [typeOfScreen]="vm.screenType"></app-mediamtx-video-player>
             </div>
         </div>
@@ -74,6 +75,8 @@
             <span class="live-duration">
                 <span *ngIf="!vm.isLive">{{ _handleCurrentDurationTimeService.currentTime | translateCurrentDuration }} / </span>
                 {{ 0 | translateCurrentDuration: _handleCurrentDurationTimeService.duration }}
+
+                {{_handleCurrentDurationTimeService.currentTime}}
             </span>
         </div>
     </div>

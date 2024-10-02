@@ -17,6 +17,7 @@ export class MediamtxVideoPlayerComponent implements OnInit, AfterViewInit {
   @Input() videoUrl!: string;
   @Input() isReferee!: boolean;
   @Input() typeOfScreen!: string;
+  @Input() currentTimeX1!: number;
 
   @ViewChild('videoPlayer', { static: true }) videoPlayer!: ElementRef;
 
@@ -46,7 +47,7 @@ export class MediamtxVideoPlayerComponent implements OnInit, AfterViewInit {
   }
  
   ngAfterViewInit() {
-    this._mediamtxVideoPlayerFacade.createVideoElement(this.videoPlayer, this.videoUrl);
+    this._mediamtxVideoPlayerFacade.createVideoElement(this.videoPlayer, this.videoUrl, this.currentTimeX1);
   }
 
   ngOnDestroy(): void {

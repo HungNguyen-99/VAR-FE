@@ -24,15 +24,18 @@ export class MediamtxVideoPlayerFacade {
         this._webSocketService!.sendMessage(objSentToReferee);
     }
 
-    createVideoElement(videoPlayer: ElementRef, videoUrl: string): void {
+    createVideoElement(videoPlayer: ElementRef, videoUrl: string, currentTimeX1?: number): void {
         if (videoPlayer && Hls.isSupported()) {
             let video = videoPlayer!.nativeElement;
             this.hls.loadSource(videoUrl);
             this.hls.attachMedia(videoPlayer?.nativeElement);
             this.hls.on(Hls.Events.MEDIA_ATTACHED, () => {
-                if (videoPlayer) {
+                console.log('MEDIA_ATTACHED');
+                if (videoPlayer && !currentTimeX1) {
                     video.addEventListener('timeupdate', () => {
-                        this._handleCurrentDurationTimeService.currentTime = video.currentTime;
+                        if(!currentTimeX1){
+                            this._handleCurrentDurationTimeService.currentTime = video.currentTime;
+                        }
                         this._handleCurrentDurationTimeService.duration = video.duration;
                         this._handleCurrentDurationTimeService.isPause = video.paused;
                         this._handleSyncAllVideoService?.sendDoneUpdateTime(true);
@@ -57,6 +60,17 @@ export class MediamtxVideoPlayerFacade {
                 });
                 this.hls.currentLevel = lowestQualityLevel;
                 video.play();
+            });
+            video.addEventListener('loadedmetadata', () => {
+                // Video is initialized
+                if(currentTimeX1) {
+                    video.currentTime = currentTimeX1;
+                    if(this._handleCurrentDurationTimeService.isPause) {
+                        video.pause();
+                    }else {
+                        video.play();
+                    }
+                }
             });
         }
     }
