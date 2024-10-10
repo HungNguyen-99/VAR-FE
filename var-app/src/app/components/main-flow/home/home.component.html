@@ -75,8 +75,6 @@
             <span class="live-duration">
                 <span *ngIf="!vm.isLive">{{ _handleCurrentDurationTimeService.currentTime | translateCurrentDuration }} / </span>
                 {{ 0 | translateCurrentDuration: _handleCurrentDurationTimeService.duration }}
-
-                {{_handleCurrentDurationTimeService.currentTime}}
             </span>
         </div>
     </div>

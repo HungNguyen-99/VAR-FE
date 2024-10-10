@@ -7,6 +7,7 @@ import { HandleCurrentDurationTimeService } from "../../../services/handle-curre
 import { HandleSyncAllVideoService } from "../../../services/handle-sync-all-video.service";
 import { LocService } from "../../../services/loc-service.service";
 import { WebSocketService } from "../../../services/web-socket.service";
+import { LocalStorageService } from "../../../services/localStorage.service";
 
 export interface IHomeState {
     screenType: string;
@@ -50,6 +51,7 @@ export class HomeFacade extends ComponentStore<IHomeState> {
     private readonly _webSocketService = inject(WebSocketService);
     private readonly _handleCurrentDurationTimeService = inject(HandleCurrentDurationTimeService);
     private readonly _dialog = inject(MatDialog);
+    readonly _localStorageService = inject(LocalStorageService);
 
     constructor() {
         super(initialState);
@@ -184,7 +186,8 @@ export class HomeFacade extends ComponentStore<IHomeState> {
         let objSentToReferee = {
             playBackRate: event,
         };
-        this._webSocketService!.sendMessage(objSentToReferee);
+        // this._webSocketService!.sendMessage(objSentToReferee);
+        this._localStorageService.setData(objSentToReferee);
     }
 
     endTheMatchEvent() {
@@ -273,7 +276,8 @@ export class HomeFacade extends ComponentStore<IHomeState> {
             currentTime: currentTime,
             seekVideoPlayback: true,
         };
-        this._webSocketService!.sendMessage(objSentToReferee);
+        // this._webSocketService!.sendMessage(objSentToReferee);
+        this._localStorageService.setData(objSentToReferee);
     }
 
     seekToLive() {
@@ -328,11 +332,16 @@ export class HomeFacade extends ComponentStore<IHomeState> {
                     } else {
                         vid.currentTime = Math.max(vid.currentTime - 1, 0);
                     }
-                    this._webSocketService!.sendMessage({
+                    // this._webSocketService!.sendMessage({
+                    //     isPlay: false,
+                    //     currentTime: vid.currentTime,
+                    //     seekVideoPlayback: true,
+                    // });
+                    this._localStorageService.setData({
                         isPlay: false,
                         currentTime: vid.currentTime,
                         seekVideoPlayback: true,
-                    });;
+                    });
                     this.updateCurrentIsLive(false);
                     break;
                 case TYPE_CONTROL.FORWARD:
@@ -342,7 +351,12 @@ export class HomeFacade extends ComponentStore<IHomeState> {
                     } else {
                         vid.currentTime = Math.max(vid.currentTime + 1, 0);
                     }
-                    this._webSocketService!.sendMessage({
+                    // this._webSocketService!.sendMessage({
+                    //     isPlay: false,
+                    //     currentTime: vid.currentTime,
+                    //     seekVideoPlayback: true,
+                    // });
+                    this._localStorageService.setData({
                         isPlay: false,
                         currentTime: vid.currentTime,
                         seekVideoPlayback: true,

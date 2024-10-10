@@ -5,6 +5,7 @@ import { WebSocketService } from '../../../services/web-socket.service';
 import { MediamtxVideoPlayerFacade } from './mediamtx.facade';
 import { AsyncPipe, JsonPipe } from '@angular/common';
 import { HandleCurrentDurationTimeService } from '../../../services/handle-current-duration-time.service';
+import { LocalStorageService } from '../../../services/localStorage.service';
 @Component({
   selector: 'app-mediamtx-video-player',
   templateUrl: './mediamtx-video-player.component.html',
@@ -26,6 +27,7 @@ export class MediamtxVideoPlayerComponent implements OnInit, AfterViewInit {
   readonly _webSocketService = inject(WebSocketService);
   readonly _renderer = inject(Renderer2);
   readonly _locService = inject(LocService);
+  readonly _localStorageService = inject(LocalStorageService);
 
   isDragging = false;
   dragEnabled = false;
@@ -44,6 +46,10 @@ export class MediamtxVideoPlayerComponent implements OnInit, AfterViewInit {
         this.dragEnabled = rs?.status;
       }
     });
+
+    this._localStorageService.getStorageObservable().subscribe((data) => {
+      console.log(data);
+    })
   }
  
   ngAfterViewInit() {
@@ -66,7 +72,7 @@ export class MediamtxVideoPlayerComponent implements OnInit, AfterViewInit {
       deltaY: this.deltaY,
       rateValue: this._handleCurrentDurationTimeService.currentRate,
     };
-    this._mediamtxVideoPlayerFacade.dbClick(objSentToReferee);
+    this._localStorageService.setData(objSentToReferee);
   }
 
   //=====================START ZOOM=====================
@@ -79,15 +85,17 @@ export class MediamtxVideoPlayerComponent implements OnInit, AfterViewInit {
       this.zoomIn(event?.currentZoom);
     }
 
+    debugger
     if (!this.isReferee) {
       this.deltaY = event.deltaY;
       let objSentToReferee = {
         isCurrentSource: true,
         typeOfAction: 'zoom',
         deltaY: event.deltaY,
-        currentZoom: event?.currentZoom
+        currentZoom: Math.random()
       };
-      this._webSocketService!.sendMessage(objSentToReferee);
+      // this._webSocketService!.sendMessage(objSentToReferee);
+      this._localStorageService.setData(objSentToReferee);
     }
   }
 
@@ -135,14 +143,20 @@ export class MediamtxVideoPlayerComponent implements OnInit, AfterViewInit {
     this.videoPlayer.nativeElement.style.cursor = 'grabbing'; // Change cursor to grabbing
     event.preventDefault(); // Prevent default to stop text selection
 
-    this._webSocketService?.sendMessage(
-      {
-        isPlay: false,
-        typeOfAction: 'onMouseDown',
-        startX: this.startX,
-        startY: this.startY
-      }
-    )
+    // this._webSocketService?.sendMessage(
+    //   {
+    //     isPlay: false,
+    //     typeOfAction: 'onMouseDown',
+    //     startX: this.startX,
+    //     startY: this.startY
+    //   }
+    // )
+    this._localStorageService.setData({
+      isPlay: false,
+      typeOfAction: 'onMouseDown',
+      startX: this.startX,
+      startY: this.startY
+    });
   }
 
   @HostListener('document:mouseup')
@@ -160,15 +174,23 @@ export class MediamtxVideoPlayerComponent implements OnInit, AfterViewInit {
       return;
    }
     if (this.isDragging) {
-      this._webSocketService?.sendMessage(
-        {
-          isPlay: false,
-          typeOfAction: 'onMouseMove',
-          clientX: event.clientX,
-          clientY: event.clientY,
-          typeOfScreen: this._mediamtxVideoPlayerFacade.checkTypeOfScreen(this.typeOfScreen) 
-        }
-      )
+      // this._webSocketService?.sendMessage(
+      //   {
+      //     isPlay: false,
+      //     typeOfAction: 'onMouseMove',
+      //     clientX: event.clientX,
+      //     clientY: event.clientY,
+      //     typeOfScreen: this._mediamtxVideoPlayerFacade.checkTypeOfScreen(this.typeOfScreen) 
+      //   }
+      // )
+
+      this._localStorageService.setData({
+        isPlay: false,
+        typeOfAction: 'onMouseMove',
+        clientX: event.clientX,
+        clientY: event.clientY,
+        typeOfScreen: this._mediamtxVideoPlayerFacade.checkTypeOfScreen(this.typeOfScreen) 
+      });
 
       const deltaX = event.clientX - this.startX;
       const deltaY = event.clientY - this.startY;

@@ -8,6 +8,7 @@ import { HandleCurrentDurationTimeService } from "../../../services/handle-curre
 import { HandleSyncAllVideoService } from "../../../services/handle-sync-all-video.service";
 import { Subject, takeUntil, tap } from "rxjs";
 import { SCREENS } from "../../../consts/system-contant";
+import { LocalStorageService } from "../../../services/localStorage.service";
 
 @Injectable()
 export class MediamtxVideoPlayerFacade {
@@ -15,14 +16,11 @@ export class MediamtxVideoPlayerFacade {
     private readonly _webSocketService = inject(WebSocketService);
     private readonly _handleCurrentDurationTimeService = inject(HandleCurrentDurationTimeService);
     private readonly _handleSyncAllVideoService = inject(HandleSyncAllVideoService);
+    readonly _localStorageService = inject(LocalStorageService);
 
     public readonly hls = new Hls(HlsConfig);
     private isPlay: boolean = true;
     private readonly destroy$ = new Subject();
-
-    dbClick(objSentToReferee: ObjDbClickSentToReferee): void {
-        this._webSocketService!.sendMessage(objSentToReferee);
-    }
 
     createVideoElement(videoPlayer: ElementRef, videoUrl: string, currentTimeX1?: number): void {
         if (videoPlayer && Hls.isSupported()) {
@@ -134,7 +132,8 @@ export class MediamtxVideoPlayerFacade {
                         pauseOrPlayFlag: true,
                         currentTime: video.currentTime,
                     };
-                    this._webSocketService!.sendMessage(objSentToReferee);
+                    // this._webSocketService!.sendMessage(objSentToReferee);
+                    this._localStorageService.setData(objSentToReferee);
                 });
             }
         } else {
@@ -144,7 +143,8 @@ export class MediamtxVideoPlayerFacade {
                 pauseOrPlayFlag: true,
                 currentTime: video.currentTime,
             };
-            this._webSocketService!.sendMessage(objSentToReferee);
+            // this._webSocketService!.sendMessage(objSentToReferee);
+            this._localStorageService.setData(objSentToReferee);
         }
     }
 
@@ -169,7 +169,8 @@ export class MediamtxVideoPlayerFacade {
             currentTime: videoPlayer.nativeElement.currentTime,
             seekVideoPlayback: true,
         };
-        this._webSocketService!.sendMessage(objSentToReferee);
+        // this._webSocketService!.sendMessage(objSentToReferee);
+        this._localStorageService.setData(objSentToReferee);
     }
 
     checkTypeOfScreen(typeOfScreen: string) {

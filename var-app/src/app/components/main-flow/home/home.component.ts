@@ -12,6 +12,7 @@ import { FloatingMenuComponent } from '../../common/floating-menu/floating-menu.
 import { MediamtxVideoPlayerComponent } from '../../common/mediamtx-video-player/mediamtx-video-player.component';
 import { HomeFacade } from './home.facade';
 import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop';
+import { LocalStorageService } from '../../../services/localStorage.service';
 
 @Component({
   selector: 'app-home',
@@ -25,6 +26,8 @@ export class HomeComponent implements OnInit {
 
   readonly homeFacade = inject(HomeFacade);
   readonly _handleCurrentDurationTimeService = inject(HandleCurrentDurationTimeService);
+  readonly _localStorageService = inject(LocalStorageService);
+
 
   isDoneUpdateTime = false;
 
@@ -104,7 +107,8 @@ export class HomeComponent implements OnInit {
         currentTime: this.homeFacade.markedTimesHls[this.homeFacade.selectedMarkedTimeIndex],
         seekVideoPlayback: true,
       };
-      this.webSocketService!.sendMessage(objSentToReferee);
+      // this.webSocketService!.sendMessage(objSentToReferee);
+      this._localStorageService.setData(objSentToReferee);
     }
     this.homeFacade.updateCurrentIsLive(false);
   }
@@ -119,7 +123,8 @@ export class HomeComponent implements OnInit {
         currentTime: this.homeFacade.markedTimesHls[this.homeFacade.selectedMarkedTimeIndex],
         seekVideoPlayback: true,
       };
-      this.webSocketService!.sendMessage(objSentToReferee);
+      // this.webSocketService!.sendMessage(objSentToReferee);
+      this._localStorageService.setData(objSentToReferee);
     }
     this.homeFacade.updateCurrentIsLive(false);
   }

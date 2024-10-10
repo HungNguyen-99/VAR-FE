@@ -1,0 +1,14 @@
+.container {
+  height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr;
+  background-color: rgb(32, 33, 36);
+  position: relative; /* Ensure the container is positioned relatively */
+  overflow: hidden;   /* Hide overflow to manage video boundaries */
+}
+
+video {
+  width: 100%;
+  height: auto;
+  position: relative;
+}
